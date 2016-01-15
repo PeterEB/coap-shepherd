@@ -1,8 +1,9 @@
 {
-  "dependencies":{
+  "dependencies": {
     "coap": "0.12.1",
-    "lodash": "3.10.1",
-    "nedb": "1.2.1",
-    "q": "1.4.1"
+    "lodash": "^3.10.1",
+    "lwm2m-id": "^1.0.0",
+    "nedb": "^1.6.0",
+    "q": "^1.4.1"
   }
 }
