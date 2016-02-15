@@ -1,1 +1,5 @@
-{"clientName":"nodeTest","clientId":"1","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":38988,"objList":{"1":["0","1"]},"so":{"lwm2mServer":{"0":{"shortServerId":0,"lifetime":1},"1":{"shortServerId":10,"lifetime":11}}},"_id":"0xic279tJ5seLQAM"}
+{"clientName":"nodeTest","clientId":"3","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":36255,"objList":{"1":["1","2"]},"so":{"lwm2mServer":{"1":{"shortServerId":0,"lifetime":1},"2":{"defaultMaxPeriod":{"1":{"0":0,"1":1},"2":{"3":10,"4":11}},"disable":11}}},"_id":"0xic279tJ5seLQAM"}
+{"clientName":"eb","clientId":"2","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":47886,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"Q5rAzUdeDUdoDzrg"}
+{"$$deleted":true,"_id":"0xic279tJ5seLQAM"}
+{"clientName":"nodeTest","clientId":"3","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":40000,"objList":{"1":["1","2"]},"so":{"lwm2mServer":{"1":{"shortServerId":0,"lifetime":1},"2":{"defaultMaxPeriod":10,"disable":11}}},"_id":"0xic279tJ5seLQAM"}
+{"clientName":"nodeTest","clientId":"3","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":40000,"objList":{"1":["1","2"]},"so":{"lwm2mServer":{"1":{"shortServerId":0,"lifetime":1},"2":{"defaultMaxPeriod":"4","disable":11}}},"_id":"0xic279tJ5seLQAM"}
