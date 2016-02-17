@@ -1,7 +1,9 @@
-{"clientName":"nodeTest","clientId":"2","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":48704,"objList":{"1":["1","2"]},"so":{"lwm2mServer":{"1":{"shortServerId":0,"lifetime":1},"2":{"defaultMaxPeriod":10,"disable":11}}},"_id":"VrUMdam3TntPwyrq"}
-{"clientName":"eb","clientId":"3","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":45414,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"ATJsyqK5kH1quH2Q"}
-{"$$deleted":true,"_id":"ATJsyqK5kH1quH2Q"}
-{"clientName":"eb","clientId":"3","lifeTime":85671,"version":"1.0","ip":"127.0.0.1","port":44525,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"ATJsyqK5kH1quH2Q"}
-{"clientName":"eb","clientId":"3","lifeTime":85670,"version":"1.0","ip":"127.0.0.1","port":44525,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"ATJsyqK5kH1quH2Q"}
-{"$$deleted":true,"_id":"ATJsyqK5kH1quH2Q"}
-{"clientName":"eb","clientId":"3","lifeTime":85670,"version":"1.0","ip":"127.0.0.1","port":37159,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"ATJsyqK5kH1quH2Q"}
+{"clientName":"eb","clientId":"1","lifetime":85670,"version":"1.0","ip":"127.0.0.1","port":39840,"objList":{"1":["2"]},"so":{"lwm2mServer":{}},"_id":"ATJsyqK5kH1quH2Q"}
+{"clientName":"nodeTest","clientId":"2","lifetime":86400,"version":"1.0.0","ip":"127.0.0.1","port":59925,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
+{"clientName":"nodeTest","clientId":"2","lifetime":10000,"version":"1.0.0","ip":"127.0.0.1","port":59925,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
+{"$$deleted":true,"_id":"o8oB6IdBWppxyy02"}
+{"clientName":"nodeTest","clientId":"1","lifetime":10000,"version":"1.0.0","ip":"127.0.0.1","port":45677,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
+{"clientName":"nodeTest","clientId":"1","lifetime":86400,"version":"1.0.0","ip":"127.0.0.1","port":45677,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
+{"clientName":"nodeTest","clientId":"1","lifetime":10000,"version":"1.0.0","ip":"127.0.0.1","port":45677,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
+{"$$deleted":true,"_id":"o8oB6IdBWppxyy02"}
+{"clientName":"nodeTest","clientId":"1","lifetime":10000,"version":"1.0.0","ip":"127.0.0.1","port":38854,"objList":{"1":["0"],"3":["0"],"4":["0"]},"so":{"lwm2mServer":{},"device":{},"connMonitor":{}},"_id":"o8oB6IdBWppxyy02"}
