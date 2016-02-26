@@ -1,10 +1,31 @@
 {
+  "name": "coap-shepherd",
+  "version": "0.0.1",
+  "description": "A coap device manager follow OMA Lightweight M2M.",
+  "main": "index.js",
   "dependencies": {
-    "enum": "^2.2.0",
-    "coap": "0.12.1",
-    "lodash": "^3.10.1",
-    "lwm2m-id": "^1.2.0",
-    "nedb": "^1.6.0",
+    "coap": "^0.12.1",
+    "enum": "^2.3.0",
+    "lodash": "^4.5.1",
+    "lwm2m-id": "^1.2.3",
+    "nedb": "^1.8.0",
     "q": "^1.4.1"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PeterEB/coap-shepherd.git"
+  },
+  "keywords": [
+    "coap"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PeterEB/coap-shepherd/issues"
+  },
+  "homepage": "https://github.com/PeterEB/coap-shepherd"
 }
