@@ -17,7 +17,6 @@ function handler (msg) {
     } else if (msg.type === 'notify') {
         console.log(msg.data);
     }
-    
 }
 
 server.start(function (err, msg) {
