@@ -23,3 +23,9 @@ server.start(function (err, msg) {
     if (err)
         throw err;
 });
+
+// setTimeout(function () {
+//     cnode.cancelObserve('/3303/0/5702', function (err, msg) {
+//         console.log(msg);
+//     });
+// }, 20000);
