@@ -9,12 +9,14 @@ function handler (msg) {
     
     if (msg.type === 'registered') {
         cnode = msg.data;
-        cnode.observe('/3303/0/5702', function (err, res) {
-            if (err)
-                console.log(err);
-            else
-                console.log(res);  
-        });
+        // cnode.observe('/3303/0/5702', function (err, res) {
+        //     if (err)
+        //         console.log(err);
+        //     else
+        //         console.log(res);  
+        // });
+    } else if (msg.type === 'update') {
+        console.log(msg.data);
     } else if (msg.type === 'notify') {
         console.log(msg.data);
     }
@@ -34,9 +36,9 @@ server.start(function (err, msg) {
 //     });
 // }, 10000);
 
-setTimeout(function () {
-    server.stop();
-}, 10000);
+// setTimeout(function () {
+//     server.stop();
+// }, 10000);
 
 // setTimeout(function () {
 //     server.start(function (err, msg) {
