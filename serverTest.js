@@ -3,6 +3,7 @@ var server = require('./lib/coap-shepherd.js');
 var cnode;
 
 server.on('ind', handler);
+server.on('error', errorHandler);
 
 function handler (msg) {
     console.log(msg.type);
@@ -20,6 +21,10 @@ function handler (msg) {
     } else if (msg.type === 'notify') {
         console.log(msg.data);
     }
+}
+
+function errorHandler(msg) {
+    console.log(msg);
 }
 
 server.start(function (err, msg) {
