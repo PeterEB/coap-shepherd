@@ -1,45 +1,36 @@
-var server = require('./lib/coap-shepherd.js');
+var shepherd = require('./lib/coap-shepherd.js');
 
 var cnode;
 
-server.on('ind', handler);
-server.on('error', errorHandler);
+shepherd.on('ind', handler);
+shepherd.on('error', errHandler);
 
-function handler (msg) {
-    console.log(msg.type);
+function handler (ind) {
+    console.log(ind);
     
-    if (msg.type === 'registered') {
-        cnode = msg.data;
-        cnode.execute('/3303/0/5704', [1, 2], function (err, res) {
-            if (err)
-                console.log(err);
-            else
-                console.log(res);  
-        });
-    } else if (msg.type === 'update') {
-        console.log(msg.data);
-    } else if (msg.type === 'notify') {
-        console.log(msg.data);
+    if (ind.type === 'registered') {
+        cnode = shepherd.find('nodeTest');
+
+        setTimeout(function () { cnode.read('/3303/0/5702', reqHandler); }, 5000);
+        setTimeout(function () { cnode.write('/3303/0/5703', 23, reqHandler); }, 10000);
+        setTimeout(function () { cnode.execute('/3303/0/5704', ['Peter', 'world'], reqHandler); }, 15000);
+        setTimeout(function () { cnode.discover('/3303/0', reqHandler); }, 20000);
+        setTimeout(function () { cnode.observe('/3303/0', reqHandler); }, 25000);
     }
 }
 
-function errorHandler(msg) {
-    console.log(msg);
+function reqHandler (err, msg) {
+    if (err) console.log(err);
+    else console.log(msg);  
 }
 
-server.start(function (err, msg) {
-    if (err)
-        throw err;
-});
+function errHandler (err) {
+    throw err;
+}
 
-// setTimeout(function () {
-//     cnode.read('/3303/0/5700', function (err, msg) {
-//         if (err)
-//             console.log(err);
-//         else
-//             console.log(msg);  
-//     });
-// }, 10000);
+shepherd.start(function (err, msg) {
+    if (err) throw err;
+});
 
 // setTimeout(function () {
 //     server.stop();
@@ -47,7 +38,6 @@ server.start(function (err, msg) {
 
 // setTimeout(function () {
 //     server.start(function (err, msg) {
-//         if (err)
-//             throw err;
+//         if (err) throw err;
 //     });
 // }, 20000);
