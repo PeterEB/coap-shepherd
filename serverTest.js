@@ -11,11 +11,11 @@ function handler (ind) {
     if (ind.type === 'registered') {
         cnode = shepherd.find('nodeTest');
         
-        // setTimeout(function () { cnode.read('/3303/0/5702', reqHandler); }, 5000);
-        // setTimeout(function () { cnode.write('/3303/0/5703', 23, reqHandler); }, 10000);
-        // setTimeout(function () { cnode.execute('/3303/0/5704', ['Peter', 'world'], reqHandler); }, 15000);
-        // setTimeout(function () { cnode.discover('/3303/0', reqHandler); }, 20000);
-        // setTimeout(function () { cnode.observe('/3303/0', reqHandler); }, 25000);
+        setTimeout(function () { cnode.read('/3303/0/5701', reqHandler); }, 5000);
+        setTimeout(function () { cnode.write('/3303/0/5703', 23, reqHandler); }, 10000);
+        setTimeout(function () { cnode.execute('/3303/0/5704', ['Peter', 'world'], reqHandler); }, 15000);
+        setTimeout(function () { cnode.discover('/3303/0', reqHandler); }, 20000);
+        setTimeout(function () { cnode.observe('/3303/0/5702', reqHandler); }, 25000);
     }
 }
 
