@@ -2,7 +2,15 @@ var shepherd = require('./lib/coap-shepherd.js');
 
 var cnode;
 
+shepherd.on('ready', function () {
+    console.log('>> coap-shepherd server start!');
+});
+shepherd.on('stop', function () {
+    console.log('>> coap-shepherd server stop!');
+});
+
 shepherd.on('ind', handler);
+
 shepherd.on('error', errHandler);
 
 shepherd.start(function (err, msg) {
