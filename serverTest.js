@@ -67,7 +67,7 @@ function handler (ind) {
 //         setTimeout(function () { cnode.discover('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.discover('/3303/0/5704', reqHandler); }, 25000);
 //         setTimeout(function () { cnode.discover('/3303/0', reqHandler); }, 30000);
-//         setTimeout(function () { cnode.discover('/3303', reqHandler); }, 35000);
+        // setTimeout(function () { cnode.discover('/3303', reqHandler); }, 35000);
 
 // // write test
 //         setTimeout(function () { cnode.write('/3303/0/5700', 19, reqHandler); }, 3000);

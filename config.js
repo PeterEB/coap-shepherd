@@ -18,8 +18,8 @@ module.exports = {
     dbPath: null,           
 
     // request should get response in the time.
-    // default is 10 secs.
-    reqTimeout: 10,       
+    // default is 60 secs.
+    reqTimeout: 60,       
 
     // heartbeat should be updated in the time.
     // default is 30 secs.

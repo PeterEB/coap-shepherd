@@ -12,12 +12,15 @@ coap-shepherd
 <a name="Overiew"></a>
 ## 1. Overview
 
+**OMA Lightweight M2M**
 
+**coap-shepherd** 
 
 <a name="Features"></a>
 ## 2. Features
 
-
+* Communication based on CoAP protocol and library [node-coap](https://github.com/mcollina/node-coap)
+* LWM2M interfaces for Client/Server interaction
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -269,13 +272,24 @@ A registered Client Device is an instance of this class. Such an instance is den
 
 <a name="API_read"></a>
 ### cnode.read(path[, callback])
-
+Read an Object, an Object Instance, or a Resource on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
 
-2. `callback` (_Function_): `function (err, msg) { }`
+2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.05'     | Content     | Read operation is completed successfully. |
+    | '4.04'     | Not Found   | The target is not found on the Client.    |
+    | '4.05'     | Not Allowed | Target is not allowed for Read operation. |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.   |
+
+    * `msg.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is read, the returned value will be a string '_unreadble_'.
 
 **Returns:**  
 
@@ -301,13 +315,23 @@ cnode.read('/temperature/0/bar', function (err, msg) {
 *************************************************
 <a name="API_discover"></a>
 ### cnode.discover(path[, callback])
-
+Discover report settings an Object, an Object Instance, or a Resource and resource list of an Object or an Object Instance on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
 
-2. `callback` (_Function_): `function (err, msg) { }`
+2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.05'     | Content     | Discover operation is completed successfully. |
+    | '4.04'     | Not Found   | The target is not found on the Client.        |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.       |
+
+    * `msg.data` (_Object_): The field `attrs` is the object contains the parameter. If the discoved target is an Object or an Object Instance, there will be another field `resrcList`
 
 **Returns:**  
 
@@ -329,7 +353,7 @@ cnode.discover('/temperature', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: {
                         //                    attrs: { pmin: 1, pmax: 60 },
                         //                    resrcList: {
-                        //                        0: [ 5700, 5701 ]
+                        //                        0: [ '5700', '5701' ]
                         //                    }
                         //                }
                         // }
@@ -342,15 +366,25 @@ cnode.discover('/temperature/0/foo', function (err, msg) {
 *************************************************
 <a name="API_write"></a>
 ### cnode.write(path, data[, callback])
-
+Write the data to a Resource on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Object Instance or Resource on the remote Client Device.
 
-2. `data` (_Depends_): 
+2. `data` (_Depends_): the data to write to the target.
 
-3. `callback` (_Function_): `function (err, msg) { }`
+3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.04'     | Changed     | Write operation is completed successfully.     |
+    | '4.00'     | Bad Request | The format of data to be written is different. |
+    | '4.04'     | Not Found   | The target is not found on the Client.         |
+    | '4.05'     | Not Allowed | Target is not allowed for Write operation.     |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.        |
 
 **Returns:**  
 
@@ -376,15 +410,32 @@ cnode.write('/temperature/0/bar', 19, function (err, msg) {
 *************************************************
 <a name="API_writeAttr"></a>
 ### cnode.writeAttr(path, attrs[, callback])
-
+Configure the parameters of the report settings upon an Object, an Object Instance, or a Resource.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
 
-2. `attrs` (_Object_): 
+2. `attrs` (_Object_): parameters of report settings.
 
-3. `callback` (_Function_): `function (err, msg) { }`
+    | Property | Type   | Required | Description |
+    |----------|--------|----------|-------------|
+    | `pmin`   | Number | No       | Minimum Period. Minimum time in seconds the Client Device should wait between two notifications. In the absence of this parameter, the Minimum Period is defined by the Default Minimum Period set in the Server Device Account. |
+    | `pmax`   | Number | No       | Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. When maximum time expires after the last notification, a new notification should be sent. In the absence of this parameter, the Maximum Period is defined by the Default Maximum Period set in the Server Device Account. |
+    | `gt`     | Number | No       | Greater Than. The Client Device should notify notify the Server Device each time the Observed Resource value crosses the Greater Than Attribute value with respect to pmin parameter. |
+    | `lt`     | Number | No       | Less Than. The Client Device should notify the Server Device each time the Observed Resource value crosses the Less Than Attribute value with respect to pmin parameter. |
+    | `stp`    | Number | No       | Step. The Client Device should notify the Server Device when the value variation since the last notification of the Observed Resource, is greater or equal to the Step Attribute value. |
+
+3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.04'     | Changed     | Write Attributes operation is completed successfully. |
+    | '4.00'     | Bad Request | The parameter of attribute can't be recognized.       |
+    | '4.04'     | Not Found   | The target is not found on the Client.                |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.               |
 
 **Returns:**  
 
@@ -410,15 +461,25 @@ cnode.writeAttr('temperature/0/sensedValue', { foo: 0 }, function (err, msg) {
 *************************************************
 <a name="API_execute"></a>
 ### cnode.execute(path[, args][, callback])
-
+Invoke an excutable Resource on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Resource on the remote Client Device.
 
-2. `args` (_Array_): 
+2. `args` (_Array_): the arguments of the Execute operation.
 
-3. `callback` (_Function_): `function (err, msg) { }`
+3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.04'     | Changed     | Execute operation is completed successfully.               |
+    | '4.00'     | Bad Request | The Client doesn’t understand the argument in the payload. |
+    | '4.04'     | Not Found   | The target is not found on the Client.                     |
+    | '4.05'     | Not Allowed | Target is not allowed for Execute operation.               |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.                    |
 
 **Returns:**  
 
@@ -446,13 +507,24 @@ cnode.execute('/temperature/0/bar', function (err, msg) {
 *************************************************
 <a name="API_observe"></a>
 ### cnode.observe(path[, callback])
-
+Start observing a Resource on the Client Device.
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): the path of the allocated Resource on the remote Client Device.
 
-2. `callback` (_Function_): `function (err, msg) { }`
+2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.05'     | Content     | Observe operation is completed successfully. |
+    | '4.04'     | Not Found   | The target is not found on the Client.       |
+    | '4.05'     | Not Allowed | Target is not allowed for Observe operation. |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.      |
+
+    * `msg.data` (_Object_): The field `attrs` is the object contains the parameter. If the discoved target is an Object or an Object Instance, there will be another field `resrcList`
 
 **Returns:**  
 
@@ -483,13 +555,21 @@ cnode.observe('/temperature/0/sensedValue', function (err, msg) {
 *************************************************
 <a name="API_cancelObserve"></a>
 ### cnode.cancelObserve(path[, callback])
-
+Cancel observed a Resource on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
 
-2. `callback` (_Function_): `function (err, msg) { }`
+2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.05'     | Content     | Cancel Observe operation is completed successfully. |
+    | '4.04'     | Not Found   | The target is not found on the Client.              |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.             |
 
 **Returns:**  
 
@@ -510,11 +590,20 @@ cnode.cancelObserve('/temperature/0/foo', function (err, msg) {
 *************************************************
 <a name="API_ping"></a>
 ### cnode.ping([callback])
-
+Ping the Client Device.
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, msg) { }`
+1. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` response message object with status code:
+
+    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+
+    | msg.status | Status Code | Description |
+    |------------|-------------|-------------|
+    | '2.05'     | Content     | Ping operation is completed successfully. |
+    | '4.08'     | Timeout     | No response from the Client in 60 secs.   |
+
+    * `msg.data` (_Object_): The field `attrs` is the object contains the parameter. If the discoved target is an Object or an Object Instance, there will be another field `resrcList`
 
 **Returns:**  
 
@@ -524,13 +613,13 @@ cnode.cancelObserve('/temperature/0/foo', function (err, msg) {
 
 ```js
 cnode.ping(function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 10 }
+    console.log(msg);   // { status: '2.05', data: '10ms' }
 });
 ```
 *************************************************
 <a name="API_dump"></a>
 ### cnode.dump()
-
+Dump the record of the Client Device.
 
 **Arguments:**  
 
@@ -538,7 +627,17 @@ cnode.ping(function (err, msg) {
 
 **Returns:**  
 
-* (_Object_):
+* (_Object_): A data object of cnode record.
+
+    |   Property   |  Type   |  Description  |
+    |--------------|---------|---------------|
+    | `clientName` | String  | Client name of the device.                                                  |
+    | `ip`         | String  | Ip address of the device.                                                   |
+    | `port`       | Number  | Port of the device.                                                         |
+    | `lifetime`   | Number  | Lifetime of the device.                                                     |
+    | `version`    | String  | LWM2M version.                                                              |
+    | `objList`    | Object  | The list of Objects supported and Object Instances available on the device. |
+    | `so`         | Object  | All of the Objects, Object Instances and Resources.                         |
 
 **Examples:** 
 
