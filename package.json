@@ -1,7 +1,7 @@
 {
   "name": "coap-shepherd",
   "version": "0.0.2",
-  "description": "A coap device manager follow OMA Lightweight M2M.",
+  "description": "A LWM2M Server relies on CoAP.",
   "main": "index.js",
   "dependencies": {
     "coap": "^0.14.0",
