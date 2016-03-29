@@ -40,6 +40,8 @@ Note: you can find all pre-defined IPSO/OMA-LWM2M ids in library [lwm2m-id](http
 
 The goal of **coap-shepherd** is to provide a simple way to build and manage **CoAP** machine network ,it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. 
 
+Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a client of this library.
+
 ###Acronym
 
 * oid: identifier of an Object
@@ -405,7 +407,7 @@ cnode.discover('/temperature/0/sensedValue', function (err, msg) {
 cnode.discover('/temperature', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: {
                         //                       attrs: { pmin: 1, pmax: 60 },
-                        //                       resrcList: { 0: [ '5700', '5701' ] }
+                        //                       resrcList: { 0: [ 'sensorValue', 'units' ] }
                         //                   }
                         // }
 
@@ -495,17 +497,17 @@ Configure the parameters of the report settings upon an Object, an Object Instan
 **Examples:** 
 
 ```js
-cnode.writeAttr('temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, msg) {
+cnode.writeAttr('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, msg) {
     console.log(msg);   // { status: '2.04' }
 });
 
 // taget not found
-cnode.writeAttr('temperature/0/foo', { lt: 100 }, function (err, msg) {
+cnode.writeAttr('/temperature/0/foo', { lt: 100 }, function (err, msg) {
     console.log(msg);   // { status: '4.04' }
 });
 
 // parameter cannot be recognized
-cnode.writeAttr('temperature/0/sensedValue', { foo: 0 }, function (err, msg) {
+cnode.writeAttr('/temperature/0/sensedValue', { foo: 0 }, function (err, msg) {
     console.log(msg);   // { status: '4.00' }
 });
 ```

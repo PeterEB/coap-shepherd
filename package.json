@@ -1,7 +1,7 @@
 {
   "name": "coap-shepherd",
   "version": "0.0.2",
-  "description": "A LWM2M Server relies on CoAP.",
+  "description": "An implementation of CoAP device management Server.",
   "main": "index.js",
   "dependencies": {
     "coap": "^0.14.0",

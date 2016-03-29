@@ -38,7 +38,7 @@ shepherd.start(function (err) {
 
 function reqHandler (err, msg) {
     if (err) console.log(err);
-    else console.log(msg);  
+    else console.log(msg.data.resrcList);  
 }
 
 function errHandler (err) {
@@ -58,7 +58,7 @@ function handler (ind) {
 //         setTimeout(function () { cnode.read('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.read('/3303/0/5704', reqHandler); }, 25000);
 //         setTimeout(function () { cnode.read('/3303/0', reqHandler); }, 30000);
-//         setTimeout(function () { cnode.read('/3303', reqHandler); }, 35000);
+//         setTimeout(function () { cnode.read('/3303', reqHandler); }, 5000);
 
 // // discover test
 //         setTimeout(function () { cnode.discover('/3303/0/5700', reqHandler); }, 5000);
@@ -67,7 +67,7 @@ function handler (ind) {
 //         setTimeout(function () { cnode.discover('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.discover('/3303/0/5704', reqHandler); }, 25000);
 //         setTimeout(function () { cnode.discover('/3303/0', reqHandler); }, 30000);
-        // setTimeout(function () { cnode.discover('/3303', reqHandler); }, 35000);
+//         setTimeout(function () { cnode.discover('/3303', reqHandler); }, 35000);
 
 // // write test
 //         setTimeout(function () { cnode.write('/3303/0/5700', 19, reqHandler); }, 3000);
