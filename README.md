@@ -14,7 +14,7 @@ coap-shepherd
 
 [**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol based on RESTful intended to be used in resource constrained internet devices such as M2M or IoT that allows them to communicate interactively over the Internet. [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
 
-**coap-shepherd** is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management. This library uses the [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model, which requires only simple and semantic URI addressing to allocate and query Resources on Client Devices. In the following example, these requests is to read the value from a same Resource but with different style of the path.
+**coap-shepherd** is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management. This module uses the [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model, which requires only simple and semantic URI addressing to allocate and query Resources on Client Devices. In the following example, these requests is to read the value from a same Resource with different style of the path.
 
 ```js
 // path in number style
@@ -36,11 +36,11 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 });
 ```
 
-Note: you can find all pre-defined IPSO/OMA-LWM2M ids in library [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers).
+Note: you can find all pre-defined IPSO/OMA-LWM2M ids in library [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) or use your own private id.
 
 The goal of **coap-shepherd** is to provide a simple way to build and manage **CoAP** machine network ,it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. 
 
-Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a client of this library.
+Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a client of this module.
 
 ###Acronym
 
@@ -53,6 +53,7 @@ Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a 
 
 * CoAP protocol
 * Based on library [node-coap](https://github.com/mcollina/node-coap)
+* CoAP device management
 * LWM2M interfaces for Client/Server interaction
 * Smart-Object-style (IPSO)
 
