@@ -49,7 +49,7 @@ function handler (ind) {
     console.log(ind);
     
     if (ind.type === 'registered') {
-        cnode = shepherd.find('nodeTest');
+        cnode = shepherd.find('mt7688_01');
 
 // // read test
 //         setTimeout(function () { cnode.read('/3303/0/5700', reqHandler); }, 5000);
