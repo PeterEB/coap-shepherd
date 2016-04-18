@@ -12,35 +12,37 @@ coap-shepherd
 <a name="Overiew"></a>
 ## 1. Overview
 
-[**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol based on RESTful intended to be used in resource constrained internet devices such as M2M or IoT that allows them to communicate interactively over the Internet. [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
+[TBD]
 
-**coap-shepherd** is an implementation of **CoAP** device management Server with Node.js that follows part of **LWM2M** specification to achieve machine network management. This module uses the [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model, which requires only simple and semantic URI addressing to allocate and query Resources on Client Devices. In the following example, these requests is to read the value from a same Resource with different style of the path.
+[**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol and architecture that offers a for communications, via, in a machine-to-machine (M2M) network.  in a constrained RESTful environment (CoRE).
+
+[**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
+The goal of **coap-shepherd** is to provide a simple way to build and manage **CoAP** machine network ,it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. 
+
+
+**coap-shepherd** is an implementation of **CoAP** device management server with node.js. It follows most parts of **LWM2M** specification to meet the requirements of machine network management. Here is another module [**coap-node**](https://github.com/PeterEB/coap-node) that can help you with implementing a LWM2M client node.  
+
+Both **coap-shepherd** and *coap-node* uses [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model which can well organize and define resources on a machine node. With IPSO, you can allocate and query resources with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
 
 ```js
-// path in number style
-//          /oid/iid/rid
+// number style
 cnode.read('/3303/0/5700', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: 21 }
 });
 
-// path in semantic style
-//                 /oid/iid/rid
+// semantic style
 cnode.read('/temperature/0/sensedValue', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: 21 }
 });
 
-// path in hybrid style
-//                 /oid/iid/rid
+// hybrid style
 cnode.read('/temperature/0/5700', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: 21 }
 });
 ```
 
-Note: you can find all pre-defined IPSO/OMA-LWM2M ids in library [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) or use your own private id.
-
-The goal of **coap-shepherd** is to provide a simple way to build and manage **CoAP** machine network ,it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. 
-
-Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a client of this module.
+**Note**: 
+* You can find all pre-defined IPSO/OMA-LWM2M idetifiers from [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) module. You are also welcome to use your own private identifiers in **coap-shepherd**.  
 
 ###Acronym
 
@@ -51,11 +53,11 @@ Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a 
 <a name="Features"></a>
 ## 2. Features
 
-* CoAP protocol
-* Based on library [node-coap](https://github.com/mcollina/node-coap)
-* CoAP device management
-* LWM2M interfaces for Client/Server interaction
-* Smart-Object-style (IPSO)
+* CoAP protocol  
+* Based on [node-coap](https://github.com/mcollina/node-coap), a node.js CoAP client/server library  
+* Hierarchical data model in Smart-Object-style (IPSO)  
+* CoAP device and network management  
+* LWM2M interfaces for client/server interaction  
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -65,7 +67,7 @@ Note: [**coap-node**](https://github.com/PeterEB/coap-node) is implemented as a 
 <a name="Usage"></a>
 ## 4. Usage
 
-The following example starts a Server and opens permitJoin for devices to join in:
+This example shows how to start a server and allow devices to join the network for 300 seconds after the server is ready:
 
 ```js
 var cserver = require('coap-shepherd');
@@ -85,7 +87,8 @@ cserver.start(function (err) {  // start the server
 ## 5. APIs and Events
 
 #### 1. CoapShepherd APIs
->**cserver** denotes a singleton exported by `require('coap-shepherd')`.
+
+In this document, **cserver** denotes an instance of CoapShepherd class. **cserver** is also a singleton exported by `require('coap-shepherd')`.  
 
 * [cserver.start()](#API_start)
 * [cserver.stop()](#API_stop)
@@ -96,7 +99,8 @@ cserver.start(function (err) {  // start the server
 * Events: [ready](#EVT_ready), [ind](#EVT_ind), and [error](#EVT_error)
 
 #### 2. CoapNode APIs
->**cnode** denotes the instance of this class.
+
+CoapNode is the class for cserver to create software endpoints of remote devices at server-side. In this document, **cnode** denotes an instance of CoapNode class. You can invoke methods on a `cnode` to operate the remote device.  
 
 * [cnode.read()](#API_read)
 * [cnode.discover()](#API_discover)
@@ -108,19 +112,19 @@ cserver.start(function (err) {  // start the server
 * [cnode.ping()](#API_ping)
 * [cnode.dump()](#API_dump)
 
-Note: The type _Depends_ meaning depends the type of target.
+Note: The type _Depends_ meaning depends the type of target. [??? TBD]
 
 *************************************************
 ## CoapShepherd Class
-Exposed by `require('coap-shepherd')`. All the Server configuration is read from the `config.js` file in the root of the project.
+Server configuration is read from file `config.js` in the root folder of this module.  
 
 <a name="API_start"></a>
 ### cserver.start([callback])
-Start the cserver.
+Start the cserver.  
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err) { }` Get called after the starting procedure done.
+1. `callback` (_Function_): `function (err) { }`. Get called after starting procedure is done.  
 
 **Returns:**  
 
@@ -130,9 +134,10 @@ Start the cserver.
 
 ```js
 cserver.start(function (err) {
-    console.log('server start.');
+    console.log('server is started.');
 });
 ```
+
 *************************************************
 <a name="API_stop"></a>
 ### cserver.stop([callback])
@@ -140,7 +145,7 @@ Stop the cserver.
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err) { }` Get called after the stopping procedure done.
+1. `callback` (_Function_): `function (err) { }`. Get called after stopping procedure is done.  
 
 **Returns:**  
 
@@ -150,17 +155,18 @@ Stop the cserver.
 
 ```js
 cserver.stop(function (err) {
-    console.log('server stop.');
+    console.log('server stopped.');
 });
 ```
+
 *************************************************
 <a name="API_permitJoin"></a>
 ### cserver.permitJoin(time)
-Open for devices to join the network. 
+Allow or disallow devices to join the network.  
 
 **Arguments:**  
 
-1. `time` (_Number_): Timing in seconds for csever openning for devices to join the network. Set `time` to `0` can immediately close the admission.
+1. `time` (_Number_): Time in seconds for csever to allow devices to join the network. Set `time` to `0` can immediately close the admission.  
 
 **Returns:**  
 
@@ -169,36 +175,41 @@ Open for devices to join the network.
 **Examples:** 
 
 ```js
-cserver.API_permitJoin(300); 
+cserver.permitJoin(300); 
 ```
+
 *************************************************
 <a name="API_find"></a>
 ### cserver.find(clientName)
-Find the Client Device (cnode) in the cserver.
+Find a registered Client Device (cnode) on cserver.  
 
 **Arguments:**  
 
-1. `clientName` (_String_): Client name of the device to find.
+1. `clientName` (_String_): Client name of the device to find for.
 
 **Returns:**  
 
-* (Object): a cnode of clientName. Returns `undefined` if not found.
+* (Object): cnode. Returns `undefined` if not found.
 
 **Examples:** 
 
 ```js
-var cnode = cserver.find('foo_Name');
+var cnode = cserver.find('foo_name');
+
+if (cnode) {
+    // do something upon the cnode, like cnode.read()
+}
 ```
+
 *************************************************
 <a name="API_removeNode"></a>
-### cserver.removeNode(clientName[, callback])
-Deregister and remove the Client Device (cnode) from the cserver.
+### cserver.remove(clientName[, callback]) -> removeNode to remove
+Deregister and remove a cnode from cserver.  
 
 **Arguments:**  
 
 1. `clientName` (_String_): Client name of the device to remove.
-
-2. `callback` (_Function_): `function (err) { }` Get called after the remove procedure done.
+2. `callback` (_Function_): `function (err) { }`. Get called after the removal is done.  
 
 **Returns:**  
 
@@ -207,18 +218,17 @@ Deregister and remove the Client Device (cnode) from the cserver.
 **Examples:** 
 
 ```js
-cserver.removeNode('foo_Name');
+cserver.remove('foo_name');
 ```
 *************************************************
 <a name="API_announce"></a>
 ### cserver.announce(msg[, callback])
-The Server can use this method to announce messages.
+The server can use this method to announce any message to all client devices.  
 
 **Arguments:**  
 
-1. `msg` (_String_): The message to announce.
-
-2. `callback` (_Function_): `function (err) { }` Get called after message announced.
+1. `msg` (_String_): The message to announce.  
+2. `callback` (_Function_): `function (err) { }`. Get called after message announced.
 
 **Returns:**  
 
@@ -229,31 +239,35 @@ The Server can use this method to announce messages.
 ```js
 cserver.announce('Hum!');
 ```
+
 *************************************************
 <a name="EVT_ready"></a>
 ### Event: 'ready'
-`function () { }`
-Fired when the Server is ready.
+`function () { }`  
+Fired when the server is ready.
 
 *************************************************
 <a name="EVT_error"></a>
 ### Event: 'error'
-`function (err) { }`
+`function (err) { }`  
 Fired when there is an error occurred.
 
 *************************************************
 <a name="EVT_ind"></a>
 ### Event: 'ind'
-`function (type, msg) { }` Fired when there is an incoming indication message. There are 6 kinds of indication type including `registered`, `update`, `deregistered`, `online`, `offline` and `notify`.
+`function (type, msg) { }`  
+Fired when there is an incoming indication message. There are 6 types of indication including `registered`, `update`, `deregistered`, `online`, `offline`, and `notify`.  
 
-* ##### registered
+* **registered**
     * type: `'registered'`
-    * msg (_Object_): a cnode of which Device is registering.
+    * msg (_Object_): a cnode of which Device successfuly registered to cserver.  
+
 <br />
 
-* ##### update
+* **update**
     * type: `'update'`
-    * msg (_Object_): this object has field `device`,and may have fields of `lifetime`, `objList`, `ip`, `port`.
+    * msg (_Object_): this object at least has the `device` field to denote the name of a client device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.
+
 <br />
 
         ```js
@@ -264,24 +278,27 @@ Fired when there is an error occurred.
         }
         ```
 
-* ##### deregistered
+* **deregistered**
     * type: `'deregistered'`
-    * msg (_String_): the clientName of which Device is deregistering.
+    * msg (_String_): clientName of which device successfully deregistered from cserver.  
+
 <br />
 
-* ##### online
+* **online**
     * type: `'online'`
-    * msg (_String_): the clientName of which Device is online.
+    * msg (_String_): clientName of which device is going online.  
+
 <br />
 
-* ##### offline
+* **offline**
     * type: `'offline'`
-    * msg (_String_): the clientName of which Device is offline.
+    * msg (_String_): clientName of which device is going offline.  
+
 <br />
 
-* ##### notify
+* **notify**
     * type: `'notify'`
-    * msg (_Object_): the notification from the Client Device. This object has fileds of `device`, `path`, and `data`.
+    * msg (_Object_): the notification from a client device. This object has fileds of `device`, `path`, and `data`.  
 
         ```js
         // example of a Resource notification
@@ -302,10 +319,11 @@ Fired when there is an error occurred.
         ```
 
 ***********************************************
+
 <br /> 
 
 ## CoapNode Class
-A registered Client Device is an instance of this class. This class provides you with methods to perform remote operations upon a Client Device. The `cnode` device can be found by `cserver.find()`
+This class provides you with methods to perform remote operations upon a registered Client Device. Such an instance of this class is denoted as `cnode` in this document. You can use `cserver.find()` with the clientName to find a registered cnode in cserver.  
 
 <a name="API_read"></a>
 ### cnode.read(path[, callback])
