@@ -12,7 +12,11 @@ coap-shepherd
 <a name="Overiew"></a>
 ## 1. Overview
 
+<br />
+
 [---- WAITING FOR REVISING, Ignore this section ----]
+
+<br />
 
 [**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol and architecture that offers a for communications, via, in a machine-to-machine (M2M) network.  in a constrained RESTful environment (CoRE).
 
@@ -50,8 +54,14 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 * **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))
 * **oid**: identifier of an _Object_
 * **iid**: identifier of an _Object Instance_
-* **rid**: indetifier of a _Resource_
+* **rid**: indetifier of a _Resource_  
+  
+<br />
+
 [---- END: WAITING FOR REVISING, Ignore this section ----]
+
+<br />
+<br />
 
 <a name="Features"></a>
 ## 2. Features
