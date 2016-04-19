@@ -46,9 +46,12 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 
 ###Acronym
 
-* oid: identifier of an Object
-* iid: identifier of an Object Instance
-* rid: indetifier of a Resource
+* **Server**: LWM2M Server ([coap-shepherd](https://github.com/PeterEB/coap-shepherd))
+* **Client** or **Client Device**: LWM2M Client ([coap-node](https://github.com/PeterEB/coap-node))
+* **oid**: identifier of an _Object_
+* **iid**: identifier of an _Object Instance_
+* **rid**: indetifier of a _Resource_
+
 
 <a name="Features"></a>
 ## 2. Features
@@ -260,15 +263,12 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 
 * **registered**
     * type: `'registered'`
-    * msg (_Object_): a cnode of which Device successfuly registered to cserver.  
+    * msg (_Object_): a cnode of which Client Device has successfuly registered to cserver.  
 
-<br />
 
 * **update**
     * type: `'update'`
-    * msg (_Object_): this object at least has the `device` field to denote the name of a client device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.
-
-<br />
+    * msg (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
 
         ```js
         // example
@@ -280,25 +280,19 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 
 * **deregistered**
     * type: `'deregistered'`
-    * msg (_String_): clientName of which device successfully deregistered from cserver.  
-
-<br />
+    * msg (_String_): clientName of which Client Device has successfully deregistered from cserver.  
 
 * **online**
     * type: `'online'`
-    * msg (_String_): clientName of which device is going online.  
-
-<br />
+    * msg (_String_): clientName of which Client Device is going online.  
 
 * **offline**
     * type: `'offline'`
-    * msg (_String_): clientName of which device is going offline.  
-
-<br />
+    * msg (_String_): clientName of which Client Device is going offline.  
 
 * **notify**
     * type: `'notify'`
-    * msg (_Object_): the notification from a client device. This object has fileds of `device`, `path`, and `data`.  
+    * msg (_Object_): notification from a Client Device. This object has fileds of `device`, `path`, and `data`.  
 
         ```js
         // example of a Resource notification
@@ -323,28 +317,28 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 <br /> 
 
 ## CoapNode Class
-This class provides you with methods to perform remote operations upon a registered Client Device. Such an instance of this class is denoted as `cnode` in this document. You can use `cserver.find()` with the clientName to find a registered cnode in cserver.  
+
+This class provides you with methods to perform remote operations upon a registered Client Device. An instance of this class is denoted as `cnode` in this document. You can use `cserver.find()` with a clientName to find the registered cnode on cserver.  
 
 <a name="API_read"></a>
 ### cnode.read(path[, callback])
-Read an Object, an Object Instance, or a Resource on the Client Device.
+Remotely read an Object, an Object Instance, or a Resource from the Client Device.
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object, Object Instance or Resource on the remote Client Device.
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+    * `rsp.status` (_String_)  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+        | rsp.status | Status Code | Description                               |
+        |------------|-------------|-------------------------------------------|
+        | '2.05'     | Content     | Read operation is completed successfully. |
+        | '4.04'     | Not Found   | Target is not found on the Client.        |
+        | '4.05'     | Not Allowed | Target is not allowed for Read operation. |
+        | '4.08'     | Timeout     | No response from the Client in 60 secs.   |
 
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.05       | Content     | Read operation is completed successfully. |
-        | 4.04       | Not Found   | The target is not found on the Client.    |
-        | 4.05       | Not Allowed | Target is not allowed for Read operation. |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.   |
-
-    * `msg.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is read, the returned value will be a string '\_unreadble\_'.
+    * `rsp.data` (_Depends_): `data` can be the value of an Object, an Object Instance, or a Resource. Note that when an unreadable Resource is read, the status code will be '4.05' and the returned value will be a string '\_unreadable\_'.
 
 **Returns:**  
 
@@ -353,59 +347,66 @@ Read an Object, an Object Instance, or a Resource on the Client Device.
 **Examples:** 
 
 ```js
-// read from a Resource
-cnode.read('/temperature/0/sensedValue', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 21 }
+// read a Resource
+cnode.read('/temperature/0/sensedValue', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
-// read from a Object Instance
-cnode.read('/temperature/0', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: { 
-                        //                       sensedValue: 21 
-                        //                   } 
-                        // }
+// read an Object Instance
+cnode.read('/temperature/0', function (err, rsp) {
+    console.log(rsp);
+
+    // {
+    //    status: '2.05',
+    //    data: { 
+    //      sensedValue: 21 
+    //    } 
+    // }
 });
 
-// read from a Object
-cnode.read('/temperature', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: { 
-                        //                       0: { 
-                        //                             sensedValue: 21 
-                        //                         } 
-                        //                   } 
-                        // }
+// read an Object
+cnode.read('/temperature', function (err, rsp) {
+    console.log(rsp);
+
+    // {
+    //    status: '2.05',
+    //    data: { 
+    //      0: { 
+    //            sensedValue: 21 
+    //         } 
+    //    }
+    // }
 });
 
 // target not found
-cnode.read('/temperature/0/foo', function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.read('/temperature/0/foo', function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unreadable
-cnode.read('/temperature/0/bar', function (err, msg) {
-    console.log(msg);   // { status: '4.05', data: '_unreadable_' }
+cnode.read('/temperature/0/bar', function (err, rsp) {
+    console.log(rsp);   // { status: '4.05', data: '_unreadable_' }
 });
 ```
 *************************************************
 <a name="API_discover"></a>
 ### cnode.discover(path[, callback])
-Discover report settings an Object, an Object Instance, or a Resource and resource list of an Object or an Object Instance on the Client Device.
+Discover report settings of an Object, an Object Instance, or a Resource on the Client Device.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+    * `rsp.status` (_String_)  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+        | rsp.status | Status      | Description                                   |
+        |------------|-------------|-----------------------------------------------|
+        | '2.05'     | Content     | Discover operation is completed successfully. |
+        | '4.04'     | Not Found   | Target is not found on the Client.            |
+        | '4.08'     | Timeout     | No response from the Client in 60 secs.       |
 
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.05       | Content     | Discover operation is completed successfully. |
-        | 4.04       | Not Found   | The target is not found on the Client.        |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.       |
-
-    * `msg.data` (_Object_): The field `attrs` is the object contains the parameter. If the discoved target is an Object or an Object Instance, there will be another field `resrcList`.
+    * `rsp.data` (_Object_): This is an object of the report settings. `data.attrs` contains parameters of the setthing. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance.  
 
 **Returns:**  
 
@@ -415,48 +416,63 @@ Discover report settings an Object, an Object Instance, or a Resource and resour
 
 ```js
 // discover a Resource
-cnode.discover('/temperature/0/sensedValue', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: {
-                        //                       attrs: { pmin: 10, pmax: 90, gt: 0 }
-                        //                }
-                        // }
+cnode.discover('/temperature/0/sensedValue', function (err, rsp) {
+    console.log(rsp);
+
+    // {
+    //    status: '2.05',
+    //    data: {
+    //      attrs: { 
+    //        pmin: 10, 
+    //        pmax: 90,
+    //        gt: 0
+    //      }
+    //    }
+    // }
 });
 
 // discover an Object
-cnode.discover('/temperature', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: {
-                        //                       attrs: { pmin: 1, pmax: 60 },
-                        //                       resrcList: { 0: [ 'sensorValue', 'units' ] }
-                        //                   }
-                        // }
+cnode.discover('/temperature', function (err, rsp) {
+    console.log(rsp);
+
+    // {
+    //    status: '2.05',
+    //    data: {
+    //      attrs: { 
+    //        pmin: 1, 
+    //        pmax: 60
+    //      },
+    //      resrcList: {
+    //          0: [ 'sensorValue', 'units' ]
+    //      }
+    //    }
+    // }
 
 // target not found
-cnode.discover('/temperature/0/foo', function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.discover('/temperature/0/foo', function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 ```
 *************************************************
 <a name="API_write"></a>
 ### cnode.write(path, data[, callback])
-Write the data to a Resource on the Client Device.
+Remotely write a data to a Resource on the Client Device. [TBD] Support Resource(s) in an Object Instance? You should make it clear.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.  
+2. `data` (_Depends_): data to write to the target. [TBD] Support Resource(s) in an Object Instance?  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-2. `data` (_Depends_): the data to write to the target.
+    * `rsp.status` (_String_)  
 
-3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
-
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
-
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.04       | Changed     | Write operation is completed successfully.     |
-        | 4.00       | Bad Request | The format of data to be written is different. |
-        | 4.04       | Not Found   | The target is not found on the Client.         |
-        | 4.05       | Not Allowed | Target is not allowed for Write operation.     |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.        |
+        | rsp.status | Status      | Description                                    |
+        |------------|-------------|------------------------------------------------|
+        | '2.04'     | Changed     | Write operation is completed successfully      |
+        | '4.00'     | Bad Request | The format of data to be written is different. |
+        | '4.04'     | Not Found   | Target is not found on the Client.             |
+        | '4.05'     | Not Allowed | Target is not allowed for Write operation.     |
+        | '4.08'     | Timeout     | No response from the Client in 60 secs.        |
 
 **Returns:**  
 
@@ -465,49 +481,54 @@ Write the data to a Resource on the Client Device.
 **Examples:** 
 
 ```js
-cnode.write('/temperature/0/sensedValue', 19, function (err, msg) {
-    console.log(msg);   // { status: '2.04' }
+cnode.write('/temperature/0/sensedValue', 19, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
 });
 
 // target not found
-cnode.write('/temperature/0/foo', 19, function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.write('/temperature/0/foo', 19, function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unwritable
-cnode.write('/temperature/0/bar', 19, function (err, msg) {
-    console.log(msg);   // { status: '4.05' }
+cnode.write('/temperature/0/bar', 19, function (err, rsp) {
+    console.log(rsp);   // { status: '4.05' }
 });
 ```
 *************************************************
 <a name="API_writeAttr"></a>
-### cnode.writeAttr(path, attrs[, callback])
-Configure the parameters of the report settings upon an Object, an Object Instance, or a Resource.
+### cnode.writeAttr(path, attrs[, callback]) [TBD] it is better to use writeAttr**s** as the API name
+Configure the parameters of the report settings of an Object, an Object Instance, or a Resource.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
+2. `attrs` (_Object_): parameters of the report settings.  
 
-2. `attrs` (_Object_): parameters of report settings.
+    [TBD] check your pmin and pmax behavior
+        In spec 20151214C
+            5.1.2 Attributes Classification, Table 4, Minimum Period
+            5.5.2 Notify
+        The new spec is weird.  
 
     | Property | Type   | Required | Description |
     |----------|--------|----------|-------------|
-    | `pmin`   | Number | No       | Minimum Period. Minimum time in seconds the Client Device should wait between two notifications. |
-    | `pmax`   | Number | No       | Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. When maximum time expires after the last notification, a new notification should be sent. |
-    | `gt`     | Number | No       | Greater Than. The Client Device should notify the Server Device each time the Observed Resource value crosses the Greater Than Attribute value with respect to pmin parameter. |
-    | `lt`     | Number | No       | Less Than. The Client Device should notify the Server Device each time the Observed Resource value crosses the Less Than Attribute value with respect to pmin parameter. |
-    | `stp`    | Number | No       | Step. The Client Device should notify the Server Device when the value variation since the last notification of the Observed Resource, is greater or equal to the Step Attribute value. |
+    | pmin     | Number | No       | Minimum Period. Minimum time in seconds the Client Device should wait between two notifications. |
+    | pmax     | Number | No       | Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. When maximum time expires after the last notification, a new notification should be sent. |
+    | gt       | Number | No       | Greater Than. The Client Device should notify the Server each time the Observed Resource value crosses this setthing with respect to pmin parameter. Only valid for the Resource typed as a number. |
+    | lt       | Number | No       | Less Than. The Client Device should notify the Server each time the Observed Resource value crosses this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
+    | stp      | Number | No       | Step. The Client Device should notify the Server when the change of the Resource value, since the last report happened, is greater or equal to this setting. Only valid for the Resource typed as a number. |
 
-3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+    * `rsp.status` (_String_)  
 
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.04       | Changed     | Write Attributes operation is completed successfully. |
-        | 4.00       | Bad Request | The parameter of attribute can't be recognized.       |
-        | 4.04       | Not Found   | The target is not found on the Client.                |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.               |
+        | rsp.status | Status      | Description                                           |
+        |------------|-------------|-------------------------------------------------------|
+        | '2.04'     | Changed     | Write Attributes operation is completed successfully. |
+        | '4.00'     | Bad Request | Parameter of the attribute(s) can't be recognized.    |
+        | '4.04'     | Not Found   | Target is not found on the Client.                    |
+        | '4.08'     | Timeout     | No response from the Client in 60 secs.               |
 
 **Returns:**  
 
@@ -516,42 +537,40 @@ Configure the parameters of the report settings upon an Object, an Object Instan
 **Examples:** 
 
 ```js
-cnode.writeAttr('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, msg) {
-    console.log(msg);   // { status: '2.04' }
+cnode.writeAttr('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
 });
 
 // taget not found
-cnode.writeAttr('/temperature/0/foo', { lt: 100 }, function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.writeAttr('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 
 // parameter cannot be recognized
-cnode.writeAttr('/temperature/0/sensedValue', { foo: 0 }, function (err, msg) {
-    console.log(msg);   // { status: '4.00' }
+cnode.writeAttr('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
+    console.log(rsp);   // { status: '4.00' }
 });
 ```
 *************************************************
 <a name="API_execute"></a>
 ### cnode.execute(path[, args][, callback])
-Invoke an excutable Resource on the Client Device.
+Invoke an excutable Resource on the Client Device. An excutable Resource is like a remote procedure call.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Resource on the remote Client Device.  
+2. `args` (_Array_): arguments to the procedure.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
 
-2. `args` (_Array_): the arguments of the Execute operation.
+    * `rsp.status` (_String_)  
 
-3. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
-
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
-
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.04       | Changed     | Execute operation is completed successfully.               |
-        | 4.00       | Bad Request | The Client doesn’t understand the argument in the payload. |
-        | 4.04       | Not Found   | The target is not found on the Client.                     |
-        | 4.05       | Not Allowed | Target is not allowed for Execute operation.               |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.                    |
+        | rsp.status   | Status      | Description                                                |
+        |--------------|-------------|------------------------------------------------------------|
+        | '2.04'       | Changed     | Execute operation is completed successfully.               |
+        | '4.00'       | Bad Request | Client doesn’t understand the argument in the payload.     |
+        | '4.04'       | Not Found   | Target is not found on the Client.                         |
+        | '4.05'       | Not Allowed | Target is not allowed for Execute operation.               |
+        | '4.08'       | Timeout     | No response from the Client in 60 secs.                    |
 
 **Returns:**  
 
@@ -562,41 +581,41 @@ Invoke an excutable Resource on the Client Device.
 ```js
 // assume there in an executable Resource with the singnatue
 // function(t) { ... } to blink an LED t times.
-cnode.execute('/led/0/blink', [ 10 ] ,function (err, msg) {
-    console.log(msg);   // { status: '2.04' }
+cnode.execute('/led/0/blink', [ 10 ] ,function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
 });
 
 // target not found
-cnode.execute('/temperature/0/foo', function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.execute('/temperature/0/foo', function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unexecuteable
-cnode.execute('/temperature/0/bar', function (err, msg) {
-    console.log(msg);   // { status: '4.05' }
+cnode.execute('/temperature/0/bar', function (err, rsp) {
+    console.log(rsp);   // { status: '4.05' }
 });
 ```
 *************************************************
 <a name="API_observe"></a>
 ### cnode.observe(path[, callback])
 Start observing a Resource on the Client Device.
+[TBD] Do you support Object and Object Instance observation?
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Resource on the remote Client Device.
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+    * `rsp.status` (_String_)  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+        | rsp.status   | Status      | Description                                  |
+        |--------------|-------------|----------------------------------------------|
+        | '2.05'       | Content     | Observe operation is completed successfully. |
+        | '4.04'       | Not Found   | The target is not found on the Client.       |
+        | '4.05'       | Not Allowed | Target is not allowed for Observe operation. |
+        | '4.08'       | Timeout     | No response from the Client in 60 secs.      |
 
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.05       | Content     | Observe operation is completed successfully. |
-        | 4.04       | Not Found   | The target is not found on the Client.       |
-        | 4.05       | Not Allowed | Target is not allowed for Observe operation. |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.      |
-
-   * `msg.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'.
+   * `rsp.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'. [TBD] unnecessary to return user a rsp.data, it is very confused
 
 **Returns:**  
 
@@ -605,43 +624,43 @@ Start observing a Resource on the Client Device.
 **Examples:** 
 
 ```js
-cnode.observe('/temperature/0/sensedValue', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 19 }
+cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05' }   [FIXME] unnecessary to return user a rsp.data, it is very confused
 });
 
 // target not found
-cnode.observe('/temperature/0/foo', function (err, msg) {
-    console.log(msg);   // { status: '4.04' }
+cnode.observe('/temperature/0/foo', function (err, rsp) {
+    console.log(rsp);   // { status: '4.04' }
 });
 
 // target is not allowed for observation
-cnode.observe('/temperature/0/bar', function (err, msg) {
-    console.log(msg);   // { status: '4.05' }
+cnode.observe('/temperature/0/bar', function (err, rsp) {
+    console.log(rsp);   // { status: '4.05' }
 });
 
 // target has been observed
-cnode.observe('/temperature/0/sensedValue', function (err, msg) {
+cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
+    // [TBD] why err if something has been observed? do you need to cancel it first then re-observe it again?
     console.log(err);   // Error['/temperature/0/bar has been observed.']
 });
 ```
 *************************************************
 <a name="API_cancelObserve"></a>
 ### cnode.cancelObserve(path[, callback])
-End an observation relationship for Resource on the Client Device.
+Stop observing an Object, an Object Instance, or a Resource on the Client Device.  
 
 **Arguments:**  
 
-1. `path` (_String_): the path of the allocated Object, Object Instance or Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object, Object Instance or Resource on the remote Client Device.  
+2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-2. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+    * `rsp.status` (_String_)  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
-
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.05       | Content     | Cancel Observe operation is completed successfully. |
-        | 4.04       | Not Found   | The target is not found on the Client.              |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.             |
+        | rsp.status   | Status      | Description                                         |
+        |--------------|-------------|-----------------------------------------------------|
+        | '2.05'       | Content     | Observation is successfully cancelled.              |
+        | '4.04'       | Not Found   | The target is not found on the Client.              |
+        | '4.08'       | Timeout     | No response from the Client in 60 secs.             |
 
 **Returns:**  
 
@@ -650,32 +669,33 @@ End an observation relationship for Resource on the Client Device.
 **Examples:** 
 
 ```js
-cnode.cancelObserve('/temperature/0/sensedValue', function (err, msg) {
-    console.log(msg);   // { status: '2.05' }
+cnode.cancelObserve('/temperature/0/sensedValue', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05' }
 });
 
 // target has not yet been observed
-cnode.cancelObserve('/temperature/0/foo', function (err, msg) {
+cnode.cancelObserve('/temperature/0/foo', function (err, rsp) {
+    // [TBD] why err if something is not observed? why not telling user by rsp.status?
     console.log(err);   // Error['/temperature/0/bar has not yet been observed.']
 });
 ```
 *************************************************
 <a name="API_ping"></a>
 ### cnode.ping([callback])
-Ping the Client Device.
+Ping the Client Device.  
 
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, msg) { }` Get called along with the response message. `msg` is response message object with status code:
+1. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
-    * `msg.status` (_String_): Status code of the response. The descriptions of status code are given in the following table.
+    * `rsp.status` (_String_)
 
-        | msg.status | Status Code | Description |
-        |------------|-------------|-------------|
-        | 2.05       | Content     | Ping operation is completed successfully. |
-        | 4.08       | Timeout     | No response from the Client in 60 secs.   |
+        | rsp.status | Status      | Description                               |
+        |------------|-------------|-------------------------------------------|
+        | '2.05'     | Content     | Ping operation is successful.             |
+        | '4.08'     | Timeout     | No response from the Client in 60 secs.   |
 
-    * `msg.data` (_String_): The approximate round trip time in milliseconds.
+    * `rsp.data` (_Number_): The approximate round trip time in milliseconds. [FIXME] data type should be a number
 
 **Returns:**  
 
@@ -684,14 +704,14 @@ Ping the Client Device.
 **Examples:** 
 
 ```js
-cnode.ping(function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: '10ms' }
+cnode.ping(function (err, rsp) {
+    console.log(rsp);   // { status: '2.05', data: 10 }
 });
 ```
 *************************************************
 <a name="API_dump"></a>
 ### cnode.dump()
-Dump the record of the Client Device.
+Dump record of the Client Device.  
 
 **Arguments:**  
 
@@ -701,8 +721,8 @@ Dump the record of the Client Device.
 
 * (_Object_): A data object of cnode record.
 
-    |   Property   |  Type   |  Description  |
-    |--------------|---------|---------------|
+    |   Property   |  Type   |  Description                                                                |
+    |--------------|---------|-----------------------------------------------------------------------------|
     | `clientName` | String  | Client name of the device.                                                  |
     | `ip`         | String  | Ip address of the device.                                                   |
     | `port`       | Number  | Port of the device.                                                         |
