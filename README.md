@@ -12,7 +12,7 @@ coap-shepherd
 <a name="Overiew"></a>
 ## 1. Overview
 
-[TBD]
+[---- WAITING FOR REVISING, Ignore this section ----]
 
 [**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol and architecture that offers a for communications, via, in a machine-to-machine (M2M) network.  in a constrained RESTful environment (CoRE).
 
@@ -46,12 +46,12 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 
 ###Acronym
 
-* **Server**: LWM2M Server ([coap-shepherd](https://github.com/PeterEB/coap-shepherd))
-* **Client** or **Client Device**: LWM2M Client ([coap-node](https://github.com/PeterEB/coap-node))
+* **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))
+* **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))
 * **oid**: identifier of an _Object_
 * **iid**: identifier of an _Object Instance_
 * **rid**: indetifier of a _Resource_
-
+[---- END: WAITING FOR REVISING, Ignore this section ----]
 
 <a name="Features"></a>
 ## 2. Features
@@ -103,7 +103,7 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 
 #### 2. CoapNode APIs
 
-CoapNode is the class for cserver to create software endpoints of remote devices at server-side. In this document, **cnode** denotes an instance of CoapNode class. You can invoke methods on a `cnode` to operate the remote device.  
+CoapNode is the class to create software endpoints of the remote Client Devices at server-side. In this document, **cnode** denotes an instance of CoapNode class. You can invoke methods on a `cnode` to operate the remote device.  
 
 * [cnode.read()](#API_read)
 * [cnode.discover()](#API_discover)
@@ -115,7 +115,7 @@ CoapNode is the class for cserver to create software endpoints of remote devices
 * [cnode.ping()](#API_ping)
 * [cnode.dump()](#API_dump)
 
-Note: The type _Depends_ meaning depends the type of target. [??? TBD]
+Note: The type _Depends_ meaning depends the type of target. [TBD, cannot understand ???]
 
 *************************************************
 ## CoapShepherd Class
@@ -188,11 +188,11 @@ Find a registered Client Device (cnode) on cserver.
 
 **Arguments:**  
 
-1. `clientName` (_String_): Client name of the device to find for.
+1. `clientName` (_String_): Name of the Client Device to find for.  
 
 **Returns:**  
 
-* (Object): cnode. Returns `undefined` if not found.
+* (Object): cnode. Returns `undefined` if not found.  
 
 **Examples:** 
 
@@ -211,7 +211,7 @@ Deregister and remove a cnode from cserver.
 
 **Arguments:**  
 
-1. `clientName` (_String_): Client name of the device to remove.
+1. `clientName` (_String_): Name of the Client Device to be removed.  
 2. `callback` (_Function_): `function (err) { }`. Get called after the removal is done.  
 
 **Returns:**  
@@ -226,12 +226,12 @@ cserver.remove('foo_name');
 *************************************************
 <a name="API_announce"></a>
 ### cserver.announce(msg[, callback])
-The server can use this method to announce any message to all client devices.  
+The cserver can use this method to announce any message to all Client Devices.  
 
 **Arguments:**  
 
 1. `msg` (_String_): The message to announce.  
-2. `callback` (_Function_): `function (err) { }`. Get called after message announced.
+2. `callback` (_Function_): `function (err) { }`. Get called after message announced.  
 
 **Returns:**  
 
@@ -247,13 +247,13 @@ cserver.announce('Hum!');
 <a name="EVT_ready"></a>
 ### Event: 'ready'
 `function () { }`  
-Fired when the server is ready.
+Fired when cserver is ready.
 
 *************************************************
 <a name="EVT_error"></a>
 ### Event: 'error'
 `function (err) { }`  
-Fired when there is an error occurred.
+Fired when there is an error occurs.
 
 *************************************************
 <a name="EVT_ind"></a>
