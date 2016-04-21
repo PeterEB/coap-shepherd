@@ -17,28 +17,28 @@ shepherd.start(function (err) {
 
 // // stop test
 // setTimeout(function () {
-//     shepherd.stop(function (err, msg) {
+//     shepherd.stop(function (err, rsp) {
 //         if (err) throw err;
 //     });
 // }, 20000);
 
 // // restart test
 // setTimeout(function () {
-//     shepherd.start(function (err, msg) {
+//     shepherd.start(function (err, rsp) {
 //         if (err) throw err;
 //     });
 // }, 30000);
 
 // // announce test
 // setTimeout(function () {
-//     shepherd.announce('Awesome!', function (err, msg) {
+//     shepherd.announce('Awesome!', function (err, rsp) {
 //         if (err) throw err;
 //     });
 // }, 15000);
 
-function reqHandler (err, msg) {
+function reqHandler (err, rsp) {
     if (err) console.log(err);
-    else console.log(msg);  
+    else console.log(rsp);  
 }
 
 function errHandler (err) {
@@ -49,7 +49,7 @@ function handler (ind) {
     console.log(ind);
     
     if (ind.type === 'registered') {
-        cnode = shepherd.find('mt7688_01');
+        cnode = shepherd.find('nodeTest');
 
 // // read test
 //         setTimeout(function () { cnode.read('/3303/0/5700', reqHandler); }, 5000);
@@ -74,7 +74,7 @@ function handler (ind) {
 //         setTimeout(function () { cnode.write('/3303/0/5702', 'Hum', reqHandler); }, 13000);
 //         setTimeout(function () { cnode.write('/3303/0/5703', 'Hum', reqHandler); }, 18000);
 //         setTimeout(function () { cnode.write('/3303/0/5704', 'Hum', reqHandler); }, 23000);
-//         setTimeout(function () { cnode.write('/3303/0', { 5700: 87, 5701: 'F' }, reqHandler); }, 28000);
+        setTimeout(function () { cnode.write('/3303/0', { 5700: 87, 5701: 'F' }, reqHandler); }, 28000);
 
 // // writeAttr test
 //         setTimeout(function () { cnode.writeAttr('/3303/0/5700', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 3000);
@@ -98,5 +98,10 @@ function handler (ind) {
 //         setTimeout(function () { cnode.observe('/3303/0/5702', reqHandler); }, 15000);
 //         setTimeout(function () { cnode.observe('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.observe('/3303/0/5704', reqHandler); }, 25000);
+
+            setTimeout(function () { cnode.observe('/3303/0', reqHandler); }, 5000);
+
+// // cancelObserve test
+//         setTimeout(function () { cnode.cancelObserve('/3303/0/5700', reqHandler); }, 8000); 
     }
 }

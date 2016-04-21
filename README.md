@@ -107,7 +107,7 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 * [cserver.stop()](#API_stop)
 * [cserver.permitJoin()](#API_permitJoin)
 * [cserver.find()](#API_find)
-* [cserver.removeNode()](#API_removeNode)
+* [cserver.remove()](#API_remove)
 * [cserver.announce()](#API_announce)
 * Events: [ready](#EVT_ready), [ind](#EVT_ind), and [error](#EVT_error)
 
@@ -118,14 +118,12 @@ CoapNode is the class to create software endpoints of the remote Client Devices 
 * [cnode.read()](#API_read)
 * [cnode.discover()](#API_discover)
 * [cnode.write()](#API_write)
-* [cnode.writeAttr()](#API_writeAttr)
+* [cnode.writeAttrs()](#API_writeAttrs)
 * [cnode.execute()](#API_execute)
 * [cnode.observe()](#API_observe)
 * [cnode.cancelObserve()](#API_cancelObserve)
 * [cnode.ping()](#API_ping)
 * [cnode.dump()](#API_dump)
-
-Note: The type _Depends_ meaning depends the type of target. [TBD, cannot understand ???]
 
 *************************************************
 ## CoapShepherd Class
@@ -215,8 +213,8 @@ if (cnode) {
 ```
 
 *************************************************
-<a name="API_removeNode"></a>
-### cserver.remove(clientName[, callback]) -> removeNode to remove
+<a name="API_remove"></a>
+### cserver.remove(clientName[, callback])
 Deregister and remove a cnode from cserver.  
 
 **Arguments:**  
@@ -466,12 +464,12 @@ cnode.discover('/temperature/0/foo', function (err, rsp) {
 *************************************************
 <a name="API_write"></a>
 ### cnode.write(path, data[, callback])
-Remotely write a data to a Resource on the Client Device. [TBD] Support Resource(s) in an Object Instance? You should make it clear.  
+Remotely write a data to an Object Instance or a Resource on the Client Device.
 
 **Arguments:**  
 
 1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.  
-2. `data` (_Depends_): data to write to the target. [TBD] Support Resource(s) in an Object Instance?  
+2. `data` (_Depends_): data to write to the Object Instance or the Resource. If target is a Object Instance, then the `data` is an Object Instance containing the Resource values..
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     * `rsp.status` (_String_)  
@@ -491,7 +489,13 @@ Remotely write a data to a Resource on the Client Device. [TBD] Support Resource
 **Examples:** 
 
 ```js
+// target is a Resource
 cnode.write('/temperature/0/sensedValue', 19, function (err, rsp) {
+    console.log(rsp);   // { status: '2.04' }
+});
+
+// target is a Object Instance
+cnode.write('/temperature/0', { sensedValue: 87, units: 'F' }, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
@@ -506,20 +510,14 @@ cnode.write('/temperature/0/bar', 19, function (err, rsp) {
 });
 ```
 *************************************************
-<a name="API_writeAttr"></a>
-### cnode.writeAttr(path, attrs[, callback]) [TBD] it is better to use writeAttr**s** as the API name
+<a name="API_writeAttrs"></a>
+### cnode.writeAttrs(path, attrs[, callback])
 Configure the parameters of the report settings of an Object, an Object Instance, or a Resource.  
 
 **Arguments:**  
 
 1. `path` (_String_): path of the allocated Object, Object Instance, or Resource on the remote Client Device.  
 2. `attrs` (_Object_): parameters of the report settings.  
-
-    [TBD] check your pmin and pmax behavior
-        In spec 20151214C
-            5.1.2 Attributes Classification, Table 4, Minimum Period
-            5.5.2 Notify
-        The new spec is weird.  
 
     | Property | Type   | Required | Description |
     |----------|--------|----------|-------------|
@@ -547,17 +545,17 @@ Configure the parameters of the report settings of an Object, an Object Instance
 **Examples:** 
 
 ```js
-cnode.writeAttr('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, rsp) {
+cnode.writeAttrs('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
 // taget not found
-cnode.writeAttr('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
+cnode.writeAttrs('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // parameter cannot be recognized
-cnode.writeAttr('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
+cnode.writeAttrs('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
     console.log(rsp);   // { status: '4.00' }
 });
 ```
@@ -608,8 +606,7 @@ cnode.execute('/temperature/0/bar', function (err, rsp) {
 *************************************************
 <a name="API_observe"></a>
 ### cnode.observe(path[, callback])
-Start observing a Resource on the Client Device.
-[TBD] Do you support Object and Object Instance observation?
+Start observing a Resource on the Client Device. [TBD] Support Object and Object Instance observation.
 
 **Arguments:**  
 
@@ -620,12 +617,13 @@ Start observing a Resource on the Client Device.
 
         | rsp.status   | Status      | Description                                  |
         |--------------|-------------|----------------------------------------------|
+        | '2.00'       | Ok          | The target has been observed.                |
         | '2.05'       | Content     | Observe operation is completed successfully. |
         | '4.04'       | Not Found   | The target is not found on the Client.       |
         | '4.05'       | Not Allowed | Target is not allowed for Observe operation. |
         | '4.08'       | Timeout     | No response from the Client in 60 secs.      |
 
-   * `rsp.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'. [TBD] unnecessary to return user a rsp.data, it is very confused
+   * `rsp.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'.
 
 **Returns:**  
 
@@ -635,7 +633,7 @@ Start observing a Resource on the Client Device.
 
 ```js
 cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
-    console.log(rsp);   // { status: '2.05' }   [FIXME] unnecessary to return user a rsp.data, it is very confused
+    console.log(rsp);   // { status: '2.05', data: 27 }
 });
 
 // target not found
@@ -650,8 +648,7 @@ cnode.observe('/temperature/0/bar', function (err, rsp) {
 
 // target has been observed
 cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
-    // [TBD] why err if something has been observed? do you need to cancel it first then re-observe it again?
-    console.log(err);   // Error['/temperature/0/bar has been observed.']
+    console.log(rsp);   // { status: '2.00' }
 });
 ```
 *************************************************
@@ -685,8 +682,7 @@ cnode.cancelObserve('/temperature/0/sensedValue', function (err, rsp) {
 
 // target has not yet been observed
 cnode.cancelObserve('/temperature/0/foo', function (err, rsp) {
-    // [TBD] why err if something is not observed? why not telling user by rsp.status?
-    console.log(err);   // Error['/temperature/0/bar has not yet been observed.']
+    console.log(rsp);   // { status: '4.04' }
 });
 ```
 *************************************************
@@ -705,7 +701,7 @@ Ping the Client Device.
         | '2.05'     | Content     | Ping operation is successful.             |
         | '4.08'     | Timeout     | No response from the Client in 60 secs.   |
 
-    * `rsp.data` (_Number_): The approximate round trip time in milliseconds. [FIXME] data type should be a number
+    * `rsp.data` (_Number_): The approximate round trip time in milliseconds.
 
 **Returns:**  
 
