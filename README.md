@@ -3,13 +3,13 @@ coap-shepherd
 
 ## Table of Contents
 
-1. [Overiew](#Overiew)    
+1. [Overview](#Overview)    
 2. [Features](#Features) 
 3. [Installation](#Installation) 
 4. [Usage](#Usage)
 5. [APIs and Events](#APIs) 
 
-<a name="Overiew"></a>
+<a name="Overview"></a>
 ## 1. Overview
 
 <br />
@@ -46,7 +46,7 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 ```
 
 **Note**: 
-* You can find all pre-defined IPSO/OMA-LWM2M idetifiers from [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) module. You are also welcome to use your own private identifiers in **coap-shepherd**.  
+* You can find all pre-defined IPSO/OMA-LWM2M identifiers from [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) module. You are also welcome to use your own private identifiers in **coap-shepherd**.  
 
 ###Acronym
 
@@ -54,7 +54,7 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 * **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))
 * **oid**: identifier of an _Object_
 * **iid**: identifier of an _Object Instance_
-* **rid**: indetifier of a _Resource_  
+* **rid**: identifier of a _Resource_  
   
 <br />
 
@@ -271,7 +271,7 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 
 * **registered**
     * type: `'registered'`
-    * msg (_Object_): a cnode of which Client Device has successfuly registered to cserver.  
+    * msg (_Object_): a cnode of which Client Device has successfully registered to cserver.  
 
 
 * **update**
@@ -300,7 +300,7 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 
 * **notify**
     * type: `'notify'`
-    * msg (_Object_): notification from a Client Device. This object has fileds of `device`, `path`, and `data`.  
+    * msg (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
 
         ```js
         // example of a Resource notification
@@ -414,7 +414,7 @@ Discover report settings of an Object, an Object Instance, or a Resource on the 
         | '4.04'     | Not Found   | Target is not found on the Client.            |
         | '4.08'     | Timeout     | No response from the Client in 60 secs.       |
 
-    * `rsp.data` (_Object_): This is an object of the report settings. `data.attrs` contains parameters of the setthing. If the discoved target is an Object, there will be an additional field `data.resrcList` to list all its Resource idetifiers under each Object Instance.  
+    * `rsp.data` (_Object_): This is an object of the report settings. `data.attrs` contains parameters of the setting. If the discovered target is an Object, there will be an additional field `data.resrcList` to list all its Resource identifiers under each Object Instance.  
 
 **Returns:**  
 
@@ -523,7 +523,7 @@ Configure the parameters of the report settings of an Object, an Object Instance
     |----------|--------|----------|-------------|
     | pmin     | Number | No       | Minimum Period. Minimum time in seconds the Client Device should wait between two notifications. |
     | pmax     | Number | No       | Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. When maximum time expires after the last notification, a new notification should be sent. |
-    | gt       | Number | No       | Greater Than. The Client Device should notify the Server each time the Observed Resource value crosses this setthing with respect to pmin parameter. Only valid for the Resource typed as a number. |
+    | gt       | Number | No       | Greater Than. The Client Device should notify the Server each time the Observed Resource value crosses this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
     | lt       | Number | No       | Less Than. The Client Device should notify the Server each time the Observed Resource value crosses this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
     | stp      | Number | No       | Step. The Client Device should notify the Server when the change of the Resource value, since the last report happened, is greater or equal to this setting. Only valid for the Resource typed as a number. |
 
@@ -549,7 +549,7 @@ cnode.writeAttrs('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, fu
     console.log(rsp);   // { status: '2.04' }
 });
 
-// taget not found
+// target not found
 cnode.writeAttrs('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
@@ -562,7 +562,7 @@ cnode.writeAttrs('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
 *************************************************
 <a name="API_execute"></a>
 ### cnode.execute(path[, args][, callback])
-Invoke an excutable Resource on the Client Device. An excutable Resource is like a remote procedure call.  
+Invoke an executable Resource on the Client Device. An executable Resource is like a remote procedure call.  
 
 **Arguments:**  
 
@@ -587,7 +587,7 @@ Invoke an excutable Resource on the Client Device. An excutable Resource is like
 **Examples:** 
 
 ```js
-// assume there in an executable Resource with the singnatue
+// assume there in an executable Resource with the signature
 // function(t) { ... } to blink an LED t times.
 cnode.execute('/led/0/blink', [ 10 ] ,function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
@@ -598,7 +598,7 @@ cnode.execute('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
-// target is unexecuteable
+// target is unexecutable
 cnode.execute('/temperature/0/bar', function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
 });
