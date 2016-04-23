@@ -269,12 +269,16 @@ Fired when there is an error occurs.
 `function (type, msg) { }`  
 Fired when there is an incoming indication message. There are 6 types of indication including `registered`, `update`, `deregistered`, `online`, `offline`, and `notify`.  
 
-* **registered**
+* **registered**  
+     Fired when there is a Client Device registered to cserver.
+
     * type: `'registered'`
     * msg (_Object_): a cnode of which Client Device has successfully registered to cserver.  
 
 
-* **update**
+* **update**  
+     Fired when there is a Client Device updated its device attributes.
+
     * type: `'update'`
     * msg (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
 
@@ -286,19 +290,27 @@ Fired when there is an incoming indication message. There are 6 types of indicat
         }
         ```
 
-* **deregistered**
+* **deregistered**  
+     Fired when there is a Client Device deregistered from cserver.
+
     * type: `'deregistered'`
     * msg (_String_): clientName of which Client Device has successfully deregistered from cserver.  
 
-* **online**
+* **online**  
+     Fired when there is a Client Device going online.
+
     * type: `'online'`
     * msg (_String_): clientName of which Client Device is going online.  
 
-* **offline**
+* **offline**  
+     Fired when there is a Client Device going offline.
+
     * type: `'offline'`
     * msg (_String_): clientName of which Client Device is going offline.  
 
-* **notify**
+* **notify**  
+     Fired when there is a Client Device that send an notification of its Object Instance or Resource.
+
     * type: `'notify'`
     * msg (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
 
@@ -523,8 +535,8 @@ Configure the parameters of the report settings of an Object, an Object Instance
     |----------|--------|----------|-------------|
     | pmin     | Number | No       | Minimum Period. Minimum time in seconds the Client Device should wait between two notifications. |
     | pmax     | Number | No       | Maximum Period. Maximum time in seconds the Client Device should wait between two notifications. When maximum time expires after the last notification, a new notification should be sent. |
-    | gt       | Number | No       | Greater Than. The Client Device should notify the Server each time the Observed Resource value crosses this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
-    | lt       | Number | No       | Less Than. The Client Device should notify the Server each time the Observed Resource value crosses this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
+    | gt       | Number | No       | Greater Than. The Client Device should notify the Server each time the Observed Resource value greater than this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
+    | lt       | Number | No       | Less Than. The Client Device should notify the Server each time the Observed Resource value less than this setting with respect to pmin parameter. Only valid for the Resource typed as a number. |
     | stp      | Number | No       | Step. The Client Device should notify the Server when the change of the Resource value, since the last report happened, is greater or equal to this setting. Only valid for the Resource typed as a number. |
 
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
@@ -568,7 +580,7 @@ Invoke an executable Resource on the Client Device. An executable Resource is li
 
 1. `path` (_String_): path of the allocated Resource on the remote Client Device.  
 2. `args` (_Array_): arguments to the procedure.  
-3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful. There will be a `data` field if the procedure does return something back, and the data type depends on the implementation at client-side.  
+3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     * `rsp.status` (_String_)  
 
@@ -667,6 +679,7 @@ Stop observing an Object, an Object Instance, or a Resource on the Client Device
         |--------------|-------------|-----------------------------------------------------|
         | '2.05'       | Content     | Observation is successfully cancelled.              |
         | '4.04'       | Not Found   | The target is not found on the Client.              |
+        | '4.05'       | Not Allowed | The target has not yet been observed on the Client. |
         | '4.08'       | Timeout     | No response from the Client in 60 secs.             |
 
 **Returns:**  
@@ -682,7 +695,7 @@ cnode.cancelObserve('/temperature/0/sensedValue', function (err, rsp) {
 
 // target has not yet been observed
 cnode.cancelObserve('/temperature/0/foo', function (err, rsp) {
-    console.log(rsp);   // { status: '4.04' }
+    console.log(rsp);   // { status: '4.05' }
 });
 ```
 *************************************************

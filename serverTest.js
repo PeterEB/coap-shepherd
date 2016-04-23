@@ -74,7 +74,7 @@ function handler (ind) {
 //         setTimeout(function () { cnode.write('/3303/0/5702', 'Hum', reqHandler); }, 13000);
 //         setTimeout(function () { cnode.write('/3303/0/5703', 'Hum', reqHandler); }, 18000);
 //         setTimeout(function () { cnode.write('/3303/0/5704', 'Hum', reqHandler); }, 23000);
-        setTimeout(function () { cnode.write('/3303/0', { 5700: 87, 5701: 'F' }, reqHandler); }, 28000);
+//         setTimeout(function () { cnode.write('/3303/0', { 5700: 87, 5701: 'F' }, reqHandler); }, 28000);
 
 // // writeAttr test
 //         setTimeout(function () { cnode.writeAttr('/3303/0/5700', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 3000);
