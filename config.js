@@ -15,19 +15,14 @@ module.exports = {
 
     // path to the file where the data is persisted.
     // default is ./lib/database/coap.db.
-    dbPath: null,           
+    dbPath: null,  
 
     // request should get response in the time.
     // default is 60 secs.
-    reqTimeout: 60,       
+    reqTimeout: 30,
 
     // heartbeat should be updated in the time.
-    // default is 30 secs.
-    hbTimeout: 30,        
-
-    // how often to check heartbeat.
-    // it must be greater than hbTimeout.
-    // default is 40 secs.
-    hbChkTime:40          
+    // default is 20 secs.
+    hbTimeout: 20
 
 };
