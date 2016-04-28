@@ -48,10 +48,12 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 **Note**: 
 * You can find all pre-defined IPSO/OMA-LWM2M identifiers from [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) module. You are also welcome to use your own private identifiers in **coap-shepherd**.  
 
-###Acronym
+###Acronyms and Abbreviations
 
 * **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))
 * **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))
+* **cserver**: instance of CoapShepherd Class
+* **cnode**: instance of CoapNode Class
 * **oid**: identifier of an _Object_
 * **iid**: identifier of an _Object Instance_
 * **rid**: identifier of a _Resource_  
