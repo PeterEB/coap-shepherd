@@ -3,33 +3,25 @@ coap-shepherd
 
 ## Table of Contents
 
-1. [Overview](#Overview)    
-2. [Features](#Features) 
-3. [Installation](#Installation) 
-4. [Usage](#Usage)
-5. [APIs and Events](#APIs) 
+1. [Overview](#Overview)  
+2. [Features](#Features)  
+3. [Installation](#Installation)  
+4. [Usage](#Usage)  
+5. [APIs and Events](#APIs)  
 
 <a name="Overview"></a>
 ## 1. Overview
 
-<br />
+[**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-[---- WAITING FOR REVISING, Ignore this section ----]
-
-<br />
-
-[**CoAP**](https://tools.ietf.org/html/rfc7252) is an application layer protocol and architecture that offers a for communications, via, in a machine-to-machine (M2M) network.  in a constrained RESTful environment (CoRE).
-
-[**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on **CoAP**. 
-The goal of **coap-shepherd** is to provide a simple way to build and manage **CoAP** machine network ,it is implemented as a server-side application framework with many network management functions, e.g. permission of device joining, reading, writing and observing resources on a remote device, remotely executing a procedure on the Device. 
-
-
-**coap-shepherd** is an implementation of **CoAP** device management server with node.js. It follows most parts of **LWM2M** specification to meet the requirements of machine network management. Here is another module [**coap-node**](https://github.com/PeterEB/coap-node) that can help you with implementing a LWM2M client node.  
-
-Both **coap-shepherd** and *coap-node* uses [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model which can well organize and define resources on a machine node. With IPSO, you can allocate and query resources with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
+The goal of **coap-shepherd** is to provide a simple way to build and manage a **CoAP** machine network.  
+* It is a server-side application framework running on node.js with many network management functions  
+* It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management  
+* Supports funtionalities, usch as permission of device joining, reading resources, writing resources, observing  resources, and executing a procedure on a remote device.  
+* It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
 
 ```js
-// number style
+// numeric style
 cnode.read('/3303/0/5700', function (err, msg) {
     console.log(msg);   // { status: '2.05', data: 21 }
 });
@@ -47,23 +39,18 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 
 **Note**: 
 * You can find all pre-defined IPSO/OMA-LWM2M identifiers from [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) module. You are also welcome to use your own private identifiers in **coap-shepherd**.  
+* Here is the client-side module [**coap-node**](https://github.com/PeterEB/coap-node) that can help you with implementing a LWM2M client node. *coap-node* uses **IPSO** data model to well organize and define resources on a machine node.  
 
 ###Acronyms and Abbreviations
 
-* **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))
-* **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))
-* **cserver**: instance of CoapShepherd Class
-* **cnode**: instance of CoapNode Class
-* **oid**: identifier of an _Object_
-* **iid**: identifier of an _Object Instance_
+* **Server**: LWM2M Server (server running with [coap-shepherd](https://github.com/PeterEB/coap-shepherd))  
+* **Client** or **Client Device**: LWM2M Client (machine running with [coap-node](https://github.com/PeterEB/coap-node))  
+* **cserver**: instance of CoapShepherd Class  
+* **cnode**: instance of CoapNode Class  
+* **oid**: identifier of an _Object_  
+* **iid**: identifier of an _Object Instance_  
 * **rid**: identifier of a _Resource_  
   
-<br />
-
-[---- END: WAITING FOR REVISING, Ignore this section ----]
-
-<br />
-<br />
 
 <a name="Features"></a>
 ## 2. Features
@@ -71,8 +58,8 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 * CoAP protocol  
 * Based on [node-coap](https://github.com/mcollina/node-coap), a node.js CoAP client/server library  
 * Hierarchical data model in Smart-Object-style (IPSO)  
-* CoAP device and network management  
-* LWM2M interfaces for client/server interaction  
+* CoAP network and devices management  
+* Client/server interaction through LWM2M-defined interfaces  
 
 <a name="Installation"></a>
 ## 3. Installation
@@ -82,14 +69,14 @@ cnode.read('/temperature/0/5700', function (err, msg) {
 <a name="Usage"></a>
 ## 4. Usage
 
-This example shows how to start a server and allow devices to join the network for 300 seconds after the server is ready:
+This example shows how to start a server and allow devices to join the network within 300 seconds after the server is ready:
 
 ```js
 var cserver = require('coap-shepherd');
 
 cserver.on('ready', function () {
     console.log('Server is ready.');
-    cserver.permitJoin(300);    // open for devices to join the network within 300 secs
+    cserver.permitJoin(300);    // allow devices to join the network within 300 secs
 });
 
 cserver.start(function (err) {  // start the server
@@ -236,7 +223,7 @@ cserver.remove('foo_name');
 *************************************************
 <a name="API_announce"></a>
 ### cserver.announce(msg[, callback])
-The cserver can use this method to announce any message to all Client Devices.  
+The cserver can use this method to announce(/broadcast) any message to all Client Devices.  
 
 **Arguments:**  
 
@@ -269,49 +256,34 @@ Fired when there is an error occurs.
 <a name="EVT_ind"></a>
 ### Event: 'ind'
 `function (type, msg) { }`  
-Fired when there is an incoming indication message. There are 6 types of indication including `registered`, `update`, `deregistered`, `online`, `offline`, and `notify`.  
+Fired when there is an incoming indication message. There are 6 types of indication including `'registered'`, `'update'`, `'deregistered'`, `'online'`, `'offline'`, and `'notify'`.  
 
 * **registered**  
-     Fired when there is a Client Device registered to cserver.
+     Fired when a Client Device registers to cserver.  
 
     * type: `'registered'`
     * msg (_Object_): a cnode of which Client Device has successfully registered to cserver.  
 
-
-* **update**  
-     Fired when there is a Client Device updated its device attributes.
-
-    * type: `'update'`
-    * msg (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
-
-        ```js
-        // example
-        {
-            device: 'foo_name',
-            lifetime: 12000
-        }
-        ```
-
 * **deregistered**  
-     Fired when there is a Client Device deregistered from cserver.
+     Fired when a Client Device deregisters from cserver.  
 
     * type: `'deregistered'`
     * msg (_String_): clientName of which Client Device has successfully deregistered from cserver.  
 
 * **online**  
-     Fired when there is a Client Device going online.
+     Fired when a Client Device goes online.
 
     * type: `'online'`
-    * msg (_String_): clientName of which Client Device is going online.  
+    * msg (_String_): clientName of which Client Device goes online.  
 
 * **offline**  
-     Fired when there is a Client Device going offline.
+     Fired when a Client Device goes offline.
 
     * type: `'offline'`
-    * msg (_String_): clientName of which Client Device is going offline.  
+    * msg (_String_): clientName of which Client Device goes offline.  
 
 * **notify**  
-     Fired when there is a Client Device that send an notification of its Object Instance or Resource.
+     Fired upon receiving an notification of Object Instance or Resource from a Client Device.  
 
     * type: `'notify'`
     * msg (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
@@ -334,6 +306,20 @@ Fired when there is an incoming indication message. There are 6 types of indicat
         }
         ```
 
+* **update**  
+     Fired when a Client Device updates its device attributes.
+
+    * type: `'update'`
+    * msg (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
+
+        ```js
+        // example
+        {
+            device: 'foo_name',
+            lifetime: 12000
+        }
+        ```
+
 ***********************************************
 
 <br /> 
@@ -353,7 +339,7 @@ Remotely read an Object, an Object Instance, or a Resource from the Client Devic
 
     * `rsp.status` (_String_)  
 
-        | rsp.status | Status Code | Description                               |
+        | rsp.status | Status      | Description                               |
         |------------|-------------|-------------------------------------------|
         | '2.05'     | Content     | Read operation is completed successfully. |
         | '4.04'     | Not Found   | Target is not found on the Client.        |
@@ -483,7 +469,7 @@ Remotely write a data to an Object Instance or a Resource on the Client Device.
 **Arguments:**  
 
 1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.  
-2. `data` (_Depends_): data to write to the Object Instance or the Resource. If target is a Object Instance, then the `data` is an Object Instance containing the Resource values..
+2. `data` (_Depends_): data to write to the Object Instance or the Resource. If target is a Object Instance, then the `data` is an Object Instance containing the Resource values.
 3. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     * `rsp.status` (_String_)  
@@ -620,7 +606,8 @@ cnode.execute('/temperature/0/bar', function (err, rsp) {
 *************************************************
 <a name="API_observe"></a>
 ### cnode.observe(path[, callback])
-Start observing a Resource on the Client Device. [TBD] Support Object and Object Instance observation.
+Start observing a Resource on the Client Device. [TBD] Support Object and Object Instance observation.  
+[TODO] You should support Object Instance observation. And just say that you don't support the observation on an Object at this moment.  
 
 **Arguments:**  
 
@@ -669,6 +656,8 @@ cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
 <a name="API_cancelObserve"></a>
 ### cnode.cancelObserve(path[, callback])
 Stop observing an Object, an Object Instance, or a Resource on the Client Device.  
+
+[TODO] You should support Object Instance observation. And just say that you don't support the observation on an Object at this moment. Thus cancel observations on Objects is not operative.  
 
 **Arguments:**  
 
@@ -744,13 +733,13 @@ Dump record of the Client Device.
 
     |   Property   |  Type   |  Description                                                                |
     |--------------|---------|-----------------------------------------------------------------------------|
-    | `clientName` | String  | Client name of the device.                                                  |
-    | `ip`         | String  | Ip address of the device.                                                   |
-    | `port`       | Number  | Port of the device.                                                         |
-    | `lifetime`   | Number  | Lifetime of the device.                                                     |
-    | `version`    | String  | LWM2M version.                                                              |
-    | `objList`    | Object  | The list of Objects supported and Object Instances available on the device. |
-    | `so`         | Object  | All of the Objects, Object Instances and Resources.                         |
+    |  clientName  | String  | Client name of the device.                                                  |
+    |  ip          | String  | Ip address of the device.                                                   |
+    |  port        | Number  | Port of the device.                                                         |
+    |  lifetime    | Number  | Lifetime of the device.                                                     |
+    |  version     | String  | LWM2M version.                                                              |
+    |  objList     | Object  | The list of Objects supported and Object Instances available on the device. |
+    |  so          | Object  | All of the Objects, Object Instances and Resources.                         |
 
 **Examples:** 
 
