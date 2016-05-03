@@ -17,23 +17,23 @@ coap-shepherd
 The goal of **coap-shepherd** is to provide a simple way to build and manage a **CoAP** machine network.  
 * It is a server-side application framework running on node.js with many network management functions  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management  
-* Supports funtionalities, usch as permission of device joining, reading resources, writing resources, observing  resources, and executing a procedure on a remote device.  
+* Supports funtionalities, such as permission of device joining, reading resources, writing resources, observing  resources, and executing a procedure on a remote device.  
 * It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
 
 ```js
 // numeric style
-cnode.read('/3303/0/5700', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 21 }
+cnode.read('/3303/0/5700', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
 // semantic style
-cnode.read('/temperature/0/sensedValue', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 21 }
+cnode.read('/temperature/0/sensedValue', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
 // hybrid style
-cnode.read('/temperature/0/5700', function (err, msg) {
-    console.log(msg);   // { status: '2.05', data: 21 }
+cnode.read('/temperature/0/5700', function (err, rsp) {
+    console.log(rsp);   // { status: '2.05', data: 21 }
 });
 ```
 
