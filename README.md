@@ -17,7 +17,7 @@ coap-shepherd
 The goal of **coap-shepherd** is to provide a simple way to build and manage a **CoAP** machine network.  
 * It is a server-side application framework running on node.js with many network management functions  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management  
-* Supports funtionalities, such as permission of device joining, reading resources, writing resources, observing  resources, and executing a procedure on a remote device.  
+* Supports functionalities, such as permission of device joining, reading resources, writing resources, observing resources, and executing a procedure on a remote device.  
 * It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
 
 ```js
@@ -606,12 +606,11 @@ cnode.execute('/temperature/0/bar', function (err, rsp) {
 *************************************************
 <a name="API_observe"></a>
 ### cnode.observe(path[, callback])
-Start observing a Resource on the Client Device. [TBD] Support Object and Object Instance observation.  
-[TODO] You should support Object Instance observation. And just say that you don't support the observation on an Object at this moment.  
+Start observing an Object Instance or a Resource on the Client Device. **coap-shepherd** don't support the observation on an Object at this moment.  
 
 **Arguments:**  
 
-1. `path` (_String_): path of the allocated Resource on the remote Client Device.
+1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.
 2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     * `rsp.status` (_String_)  
@@ -624,7 +623,7 @@ Start observing a Resource on the Client Device. [TBD] Support Object and Object
         | '4.05'       | Not Allowed | Target is not allowed for Observe operation. |
         | '4.08'       | Timeout     | No response from the Client in 60 secs.      |
 
-   * `rsp.data` (_Depends_): `data` can be the value of an Object, an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'.
+   * `rsp.data` (_Depends_): `data` can be the value of an Object Instance or a Resource. Note that when an unreadable Resource is observe, the returned value will be a string '\_unreadble\_'.
 
 **Returns:**  
 
@@ -655,13 +654,11 @@ cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
 *************************************************
 <a name="API_cancelObserve"></a>
 ### cnode.cancelObserve(path[, callback])
-Stop observing an Object, an Object Instance, or a Resource on the Client Device.  
-
-[TODO] You should support Object Instance observation. And just say that you don't support the observation on an Object at this moment. Thus cancel observations on Objects is not operative.  
+Stop observing an Object Instance or a Resource on the Client Device. **coap-shepherd** don't support the observation on an Object at this moment.  
 
 **Arguments:**  
 
-1. `path` (_String_): path of the allocated Object, Object Instance or Resource on the remote Client Device.  
+1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.  
 2. `callback` (_Function_): `function (err, rsp) { }`. The `rsp` object has a status code to indicate whether the operation is successful.  
 
     * `rsp.status` (_String_)  
