@@ -255,38 +255,38 @@ Fired when there is an error occurs.
 *************************************************
 <a name="EVT_ind"></a>
 ### Event: 'ind'
-`function (type, msg) { }`  
-Fired when there is an incoming indication message. There are 6 types of indication including `'registered'`, `'update'`, `'deregistered'`, `'online'`, `'offline'`, and `'notify'`.  
+`function (msg) { }`  
+Fired when there is an incoming indication message. There are 6 types of indication including `'registered'`, `'deregistered'`, `'online'`, `'offline'`, `'notify'`, and `'update'`.  
 
 * **registered**  
      Fired when a Client Device registers to cserver.  
 
-    * type: `'registered'`
-    * msg (_Object_): a cnode of which Client Device has successfully registered to cserver.  
+    * msg.type: `'registered'`
+    * msg.data (_Object_): a cnode of which Client Device has successfully registered to cserver.  
 
 * **deregistered**  
      Fired when a Client Device deregisters from cserver.  
 
-    * type: `'deregistered'`
-    * msg (_String_): clientName of which Client Device has successfully deregistered from cserver.  
+    * msg.type: `'deregistered'`
+    * msg.data (_String_): clientName of which Client Device has successfully deregistered from cserver.  
 
 * **online**  
      Fired when a Client Device goes online.
 
-    * type: `'online'`
-    * msg (_String_): clientName of which Client Device goes online.  
+    * msg.type: `'online'`
+    * msg.data (_String_): clientName of which Client Device goes online.  
 
 * **offline**  
      Fired when a Client Device goes offline.
 
-    * type: `'offline'`
-    * msg (_String_): clientName of which Client Device goes offline.  
+    * msg.type: `'offline'`
+    * msg.data (_String_): clientName of which Client Device goes offline.  
 
 * **notify**  
      Fired upon receiving an notification of Object Instance or Resource from a Client Device.  
 
-    * type: `'notify'`
-    * msg (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
+    * msg.type: `'notify'`
+    * msg.data (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
 
         ```js
         // example of a Resource notification
@@ -309,8 +309,8 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 * **update**  
      Fired when a Client Device updates its device attributes.
 
-    * type: `'update'`
-    * msg (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
+    * msg.type: `'update'`
+    * msg.data (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
 
         ```js
         // example
