@@ -286,21 +286,21 @@ Fired when there is an incoming indication message. There are 6 types of indicat
      Fired upon receiving an notification of Object Instance or Resource from a Client Device.  
 
     * msg.type: `'notify'`
-    * msg.data (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `data`.  
+    * msg.data (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `value`.  
 
         ```js
         // example of a Resource notification
         {
             device: 'foo_name',
             path: '/temperature/0/sensorValue',
-            data: 21
+            value: 21
         }
 
         // example of an Object Instance notification
         {
             device: 'foo_name',
             path: '/temperature/0',
-            data: {
+            value: {
                 sensorValue: 21
             }
         }
@@ -732,6 +732,7 @@ Dump record of the Client Device.
     |--------------|---------|-----------------------------------------------------------------------------|
     |  clientName  | String  | Client name of the device.                                                  |
     |  ip          | String  | Ip address of the device.                                                   |
+    |  mac         | String  | Mac adderss of the device.                                                  |
     |  port        | Number  | Port of the device.                                                         |
     |  lifetime    | Number  | Lifetime of the device.                                                     |
     |  version     | String  | LWM2M version.                                                              |
@@ -749,6 +750,7 @@ console.log(cnode.dump());
     'lifetime': 86400,
     'version': '1.0.0',
     'ip': '127.0.0.1',
+    'mac': '00:0c:29:3c:fc:7d',
     'port': 56643,
     'objList': {
         '1':['0'],

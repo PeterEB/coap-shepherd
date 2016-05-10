@@ -20,14 +20,14 @@ shepherd.start(function (err) {
 //     shepherd.stop(function (err, rsp) {
 //         if (err) throw err;
 //     });
-// }, 20000);
+// }, 5000);
 
-// // restart test
+// // reset test
 // setTimeout(function () {
-//     shepherd.start(function (err, rsp) {
+//     shepherd.reset(function (err) {
 //         if (err) throw err;
 //     });
-// }, 30000);
+// }, 10000);
 
 // // announce test
 // setTimeout(function () {
