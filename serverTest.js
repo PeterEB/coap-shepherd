@@ -50,7 +50,7 @@ function handler (msg) {
     
     if (msg.type === 'registered') {
         cnode = shepherd.find('nodeTest');
-
+        
 // // read test
 //         setTimeout(function () { cnode.read('/3303/0/5700', reqHandler); }, 5000);
 //         setTimeout(function () { cnode.read('/3303/0/5701', reqHandler); }, 10000);
@@ -102,5 +102,8 @@ function handler (msg) {
 
 // // cancelObserve test
 //         setTimeout(function () { cnode.cancelObserve('/3303/0/5700', reqHandler); }, 8000); 
+
+// ping test
+        setTimeout(function () { cnode.ping(reqHandler); }, 3000);
     }
 }
