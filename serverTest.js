@@ -4,7 +4,7 @@ var cnode;
 
 shepherd.on('ready', function () {
     console.log('>> coap-shepherd server start!');
-    shepherd.permitJoin(300);
+    shepherd.permitJoin(30000);
 });
 
 shepherd.on('ind', handler);
@@ -103,7 +103,7 @@ function handler (msg) {
 // // cancelObserve test
 //         setTimeout(function () { cnode.cancelObserve('/3303/0/5700', reqHandler); }, 8000); 
 
-// ping test
-        setTimeout(function () { cnode.ping(reqHandler); }, 3000);
+// // ping test
+//         setTimeout(function () { cnode.ping(reqHandler); }, 3000);
     }
 }
