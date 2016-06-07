@@ -105,5 +105,8 @@ function handler (msg) {
 
 // // ping test
 //         setTimeout(function () { cnode.ping(reqHandler); }, 3000);
+
+// // remove test
+//             setTimeout(function () { shepherd.remove('nodeTest'); }, 30000);
     }
 }
