@@ -1,5 +1,5 @@
 var should = require('should'),
-    SmartObject = require('../smartobject.js');
+    SmartObject = require('../lib/smartobject.js');
 
 describe('Signature Check', function () {
     var so = new SmartObject();

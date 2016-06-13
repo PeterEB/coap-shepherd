@@ -12,10 +12,11 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
+    "mocha": "^2.5.3",
     "should": "^7.1.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test-all"
   },
   "repository": {
     "type": "git",

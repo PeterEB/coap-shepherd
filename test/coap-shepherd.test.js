@@ -1,7 +1,7 @@
 var should = require('should'),
     _ = require('lodash'),
-    CoapNode = require('../coapnode'),
-    shepherd = require('../coap-shepherd');
+    CoapNode = require('../lib/coapnode'),
+    shepherd = require('../lib/coap-shepherd');
 
 describe('Constructor Check', function () {
     it('CoapShepherd', function () {

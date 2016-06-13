@@ -1,5 +1,5 @@
 var should = require('should'),
-    cutils = require('../utils/cutils.js');
+    cutils = require('../lib/utils/cutils.js');
 
 describe('Signature Check', function () {
 

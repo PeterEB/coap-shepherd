@@ -1,5 +1,9 @@
 coap-shepherd
 ========================
+[![NPM](https://nodei.co/npm/coap-shepherd.png?downloads=true)](https://nodei.co/npm/coap-shepherd/)  
+
+[![Build Status](https://travis-ci.org/PeterEB/coap-shepherd.svg?branch=master)](https://travis-ci.org/PeterEB/coap-shepherd)
+
 
 ## Table of Contents
 

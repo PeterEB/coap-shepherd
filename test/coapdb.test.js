@@ -1,10 +1,10 @@
 var fs = require('fs'),
     _ = require('lodash'),
     should = require('should'),
-    coapdb = require('../coapdb.js');
+    coapdb = require('../lib/coapdb.js');
 
 // clear the database file
-var dbPath = '../database/coap.db';
+var dbPath = '../lib/database/coap.db';
 fs.exists(dbPath, function (isThere) {
     if (isThere)
         fs.unlink(dbPath);

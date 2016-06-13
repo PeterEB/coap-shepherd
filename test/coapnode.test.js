@@ -1,7 +1,7 @@
 var should = require('should'),
     _ = require('lodash'),
-    CoapNode = require('../coapnode'),
-    SmartObject = require('../smartobject');
+    CoapNode = require('../lib/coapnode'),
+    SmartObject = require('../lib/smartobject');
 
 var devAttrs = {
         clientName: 'coap-client',
