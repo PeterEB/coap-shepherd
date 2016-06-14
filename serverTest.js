@@ -1,4 +1,4 @@
-var shepherd = require('./lib/coap-shepherd.js');
+var shepherd = require('./index.js');
 
 var cnode;
 

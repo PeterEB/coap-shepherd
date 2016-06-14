@@ -2,8 +2,9 @@ coap-shepherd
 ========================
 [![NPM](https://nodei.co/npm/coap-shepherd.png?downloads=true)](https://nodei.co/npm/coap-shepherd/)  
 
-[![Build Status](https://travis-ci.org/PeterEB/coap-shepherd.svg?branch=master)](https://travis-ci.org/PeterEB/coap-shepherd)
-
+[![Build Status](https://travis-ci.org/PeterEB/coap-shepherd.svg?branch=develop)](https://travis-ci.org/PeterEB/coap-shepherd)
+[![npm](https://img.shields.io/npm/v/coap-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/coap-shepherd)
+[![npm](https://img.shields.io/npm/l/coap-shepherd.svg?maxAge=2592000)](https://www.npmjs.com/package/coap-shepherd)
 
 ## Table of Contents
 
