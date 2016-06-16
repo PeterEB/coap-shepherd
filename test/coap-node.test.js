@@ -5,7 +5,6 @@ var should = require('should'),
 
 var devAttrs = {
         clientName: 'coap-client',
-        locationPath: '/rd/1',
         lifetime: 86400,
         ip: '192.168.1.100',
         port: '5685',
@@ -27,7 +26,7 @@ var sObj1 = {
         }
     };
 
-var fakeShp = { _newLocationPath: function () {} };
+var fakeShp = { _newClientId: function () { return 1; } };
 
 var node = new CoapNode(fakeShp, devAttrs);
 
@@ -160,6 +159,7 @@ describe('Function Check', function () {
     it('dump()', function () {
         var dumper = {
             clientName: 'coap-client',
+            clientId: 1,
             ip: '192.168.1.100',
             port: '5685',
             mac: 'AA:BB:CC:DD:EE:00',
@@ -188,6 +188,7 @@ describe('Function Check', function () {
     it('dbSave(callback)', function (done) {
         var dumper = {
             clientName: 'coap-client',
+            clientId: 1,
             ip: '192.168.1.100',
             port: '5685',
             mac: 'AA:BB:CC:DD:EE:00',
@@ -208,6 +209,7 @@ describe('Function Check', function () {
     it('dbRead(callback)', function (done) {
         var dumper = {
             clientName: 'coap-client',
+            clientId: 1,
             ip: '192.168.1.100',
             port: '5685',
             mac: 'AA:BB:CC:DD:EE:00',

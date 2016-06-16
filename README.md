@@ -752,6 +752,7 @@ console.log(cnode.dump());
 /*
 {
     'clientName': 'foo_Name',
+    'clientId': 1,
     'lifetime': 86400,
     'version': '1.0.0',
     'ip': '127.0.0.1',

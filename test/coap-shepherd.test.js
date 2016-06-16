@@ -5,9 +5,9 @@ var should = require('should'),
 
 describe('Constructor Check', function () {
     it('CoapShepherd', function () {
+        should(shepherd.clientIdCount).be.eql(1);
         should(shepherd._registry).be.eql({});
         should(shepherd._enabled).be.false();
-        should(shepherd.locationPathCount).be.eql(1);
         should(shepherd._shepherdTest).be.false();
         should(shepherd._server).be.null();
         should(shepherd._hbChecker).be.null();
