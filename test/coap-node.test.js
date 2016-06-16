@@ -1,6 +1,6 @@
 var should = require('should'),
     _ = require('lodash'),
-    CoapNode = require('../lib/coapnode'),
+    CoapNode = require('../lib/coap-node'),
     SmartObject = require('../lib/smartobject');
 
 var devAttrs = {
