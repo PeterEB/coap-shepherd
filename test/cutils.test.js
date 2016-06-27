@@ -222,8 +222,9 @@ describe('Functional Check', function () {
 
     it('encodeJsonObj', function () {
         should(cutils.encodeJsonObj('x', { 1: {  0: 'x', 1: 5 }, 2: {  0: true }})).be.eql({ e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] });
-        should(cutils.encodeJsonObj('x/y', {  0: 'x', 1: 5 })).be.eql({ e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }] });
+        should(cutils.encodeJsonObj('x/y', { 0: 'x', 1: 5, 2: new Date(100000) })).be.eql({ e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }, { n: '2', v: 100000 }] });
         should(cutils.encodeJsonObj('x/y/z', 5)).be.eql(5);
+        should(cutils.encodeJsonObj('x/y/z', new Date(100000))).be.eql(100000);
     });
 
     it('decodeJsonObj', function () {

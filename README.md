@@ -27,17 +27,17 @@ The goal of **coap-shepherd** is to provide a simple way to build and manage a *
 
 ```js
 // numeric style
-cnode.read('/3303/0/5700', function (err, rsp) {
+cnode.readReq('/3303/0/5700', function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
 // semantic style
-cnode.read('/temperature/0/sensedValue', function (err, rsp) {
+cnode.readReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
 // hybrid style
-cnode.read('/temperature/0/5700', function (err, rsp) {
+cnode.readReq('/temperature/0/5700', function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 21 }
 });
 ```
@@ -109,13 +109,13 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 
 CoapNode is the class to create software endpoints of the remote Client Devices at server-side. In this document, **cnode** denotes an instance of CoapNode class. You can invoke methods on a `cnode` to operate the remote device.  
 
-* [cnode.read()](#API_read)
-* [cnode.discover()](#API_discover)
-* [cnode.write()](#API_write)
-* [cnode.writeAttrs()](#API_writeAttrs)
-* [cnode.execute()](#API_execute)
-* [cnode.observe()](#API_observe)
-* [cnode.cancelObserve()](#API_cancelObserve)
+* [cnode.readReq()](#API_read)
+* [cnode.discoverReq()](#API_discover)
+* [cnode.writeReq()](#API_write)
+* [cnode.writeAttrsReq()](#API_writeAttrs)
+* [cnode.executeReq()](#API_execute)
+* [cnode.observeReq()](#API_observe)
+* [cnode.cancelObserveReq()](#API_cancelObserve)
 * [cnode.ping()](#API_ping)
 * [cnode.dump()](#API_dump)
 
@@ -202,7 +202,7 @@ Find a registered Client Device (cnode) on cserver.
 var cnode = cserver.find('foo_name');
 
 if (cnode) {
-    // do something upon the cnode, like cnode.read()
+    // do something upon the cnode, like cnode.readReq()
 }
 ```
 
@@ -333,8 +333,8 @@ Fired when there is an incoming indication message. There are 6 types of indicat
 
 This class provides you with methods to perform remote operations upon a registered Client Device. An instance of this class is denoted as `cnode` in this document. You can use `cserver.find()` with a clientName to find the registered cnode on cserver.  
 
-<a name="API_read"></a>
-### cnode.read(path[, callback])
+<a name="API_readReq"></a>
+### cnode.readReq(path[, callback])
 Remotely read an Object, an Object Instance, or a Resource from the Client Device.
 
 **Arguments:**  
@@ -361,12 +361,12 @@ Remotely read an Object, an Object Instance, or a Resource from the Client Devic
 
 ```js
 // read a Resource
-cnode.read('/temperature/0/sensedValue', function (err, rsp) {
+cnode.readReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 21 }
 });
 
 // read an Object Instance
-cnode.read('/temperature/0', function (err, rsp) {
+cnode.readReq('/temperature/0', function (err, rsp) {
     console.log(rsp);
 
     // {
@@ -378,7 +378,7 @@ cnode.read('/temperature/0', function (err, rsp) {
 });
 
 // read an Object
-cnode.read('/temperature', function (err, rsp) {
+cnode.readReq('/temperature', function (err, rsp) {
     console.log(rsp);
 
     // {
@@ -392,18 +392,18 @@ cnode.read('/temperature', function (err, rsp) {
 });
 
 // target not found
-cnode.read('/temperature/0/foo', function (err, rsp) {
+cnode.readReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unreadable
-cnode.read('/temperature/0/bar', function (err, rsp) {
+cnode.readReq('/temperature/0/bar', function (err, rsp) {
     console.log(rsp);   // { status: '4.05', data: '_unreadable_' }
 });
 ```
 *************************************************
-<a name="API_discover"></a>
-### cnode.discover(path[, callback])
+<a name="API_discoverReq"></a>
+### cnode.discoverReq(path[, callback])
 Discover report settings of an Object, an Object Instance, or a Resource on the Client Device.  
 
 **Arguments:**  
@@ -429,7 +429,7 @@ Discover report settings of an Object, an Object Instance, or a Resource on the 
 
 ```js
 // discover a Resource
-cnode.discover('/temperature/0/sensedValue', function (err, rsp) {
+cnode.discoverReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);
 
     // {
@@ -445,7 +445,7 @@ cnode.discover('/temperature/0/sensedValue', function (err, rsp) {
 });
 
 // discover an Object
-cnode.discover('/temperature', function (err, rsp) {
+cnode.discoverReq('/temperature', function (err, rsp) {
     console.log(rsp);
 
     // {
@@ -462,13 +462,13 @@ cnode.discover('/temperature', function (err, rsp) {
     // }
 
 // target not found
-cnode.discover('/temperature/0/foo', function (err, rsp) {
+cnode.discoverReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 ```
 *************************************************
-<a name="API_write"></a>
-### cnode.write(path, data[, callback])
+<a name="API_writeReq"></a>
+### cnode.writeReq(path, data[, callback])
 Remotely write a data to an Object Instance or a Resource on the Client Device.
 
 **Arguments:**  
@@ -495,28 +495,28 @@ Remotely write a data to an Object Instance or a Resource on the Client Device.
 
 ```js
 // target is a Resource
-cnode.write('/temperature/0/sensedValue', 19, function (err, rsp) {
+cnode.writeReq('/temperature/0/sensedValue', 19, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
 // target is a Object Instance
-cnode.write('/temperature/0', { sensedValue: 87, units: 'F' }, function (err, rsp) {
+cnode.writeReq('/temperature/0', { sensedValue: 87, units: 'F' }, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
 // target not found
-cnode.write('/temperature/0/foo', 19, function (err, rsp) {
+cnode.writeReq('/temperature/0/foo', 19, function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unwritable
-cnode.write('/temperature/0/bar', 19, function (err, rsp) {
+cnode.writeReq('/temperature/0/bar', 19, function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
 });
 ```
 *************************************************
-<a name="API_writeAttrs"></a>
-### cnode.writeAttrs(path, attrs[, callback])
+<a name="API_writeAttrsReq"></a>
+### cnode.writeAttrsReq(path, attrs[, callback])
 Configure the parameters of the report settings of an Object, an Object Instance, or a Resource.  
 
 **Arguments:**  
@@ -550,23 +550,23 @@ Configure the parameters of the report settings of an Object, an Object Instance
 **Examples:** 
 
 ```js
-cnode.writeAttrs('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, rsp) {
+cnode.writeAttrsReq('/temperature/0/sensedValue', { pmin: 10, pmax: 90, gt: 0 }, function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
 // target not found
-cnode.writeAttrs('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
+cnode.writeAttrsReq('/temperature/0/foo', { lt: 100 }, function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // parameter cannot be recognized
-cnode.writeAttrs('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
+cnode.writeAttrsReq('/temperature/0/sensedValue', { foo: 0 }, function (err, rsp) {
     console.log(rsp);   // { status: '4.00' }
 });
 ```
 *************************************************
-<a name="API_execute"></a>
-### cnode.execute(path[, args][, callback])
+<a name="API_executeReq"></a>
+### cnode.executeReq(path[, args][, callback])
 Invoke an executable Resource on the Client Device. An executable Resource is like a remote procedure call.  
 
 **Arguments:**  
@@ -594,23 +594,23 @@ Invoke an executable Resource on the Client Device. An executable Resource is li
 ```js
 // assume there in an executable Resource with the signature
 // function(t) { ... } to blink an LED t times.
-cnode.execute('/led/0/blink', [ 10 ] ,function (err, rsp) {
+cnode.executeReq('/led/0/blink', [ 10 ] ,function (err, rsp) {
     console.log(rsp);   // { status: '2.04' }
 });
 
 // target not found
-cnode.execute('/temperature/0/foo', function (err, rsp) {
+cnode.executeReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // target is unexecutable
-cnode.execute('/temperature/0/bar', function (err, rsp) {
+cnode.executeReq('/temperature/0/bar', function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
 });
 ```
 *************************************************
-<a name="API_observe"></a>
-### cnode.observe(path[, callback])
+<a name="API_observeReq"></a>
+### cnode.observeReq(path[, callback])
 Start observing an Object Instance or a Resource on the Client Device. **coap-shepherd** don't support the observation on an Object at this moment.  
 
 **Arguments:**  
@@ -637,28 +637,28 @@ Start observing an Object Instance or a Resource on the Client Device. **coap-sh
 **Examples:** 
 
 ```js
-cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
+cnode.observeReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 27 }
 });
 
 // target not found
-cnode.observe('/temperature/0/foo', function (err, rsp) {
+cnode.observeReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.04' }
 });
 
 // target is not allowed for observation
-cnode.observe('/temperature/0/bar', function (err, rsp) {
+cnode.observeReq('/temperature/0/bar', function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
 });
 
 // target has been observed
-cnode.observe('/temperature/0/sensedValue', function (err, rsp) {
+cnode.observeReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: '2.00' }
 });
 ```
 *************************************************
-<a name="API_cancelObserve"></a>
-### cnode.cancelObserve(path[, callback])
+<a name="API_cancelObserveReq"></a>
+### cnode.cancelObserveReq(path[, callback])
 Stop observing an Object Instance or a Resource on the Client Device. **coap-shepherd** don't support the observation on an Object at this moment.  
 
 **Arguments:**  
@@ -682,12 +682,12 @@ Stop observing an Object Instance or a Resource on the Client Device. **coap-she
 **Examples:** 
 
 ```js
-cnode.cancelObserve('/temperature/0/sensedValue', function (err, rsp) {
+cnode.cancelObserveReq('/temperature/0/sensedValue', function (err, rsp) {
     console.log(rsp);   // { status: '2.05' }
 });
 
 // target has not yet been observed
-cnode.cancelObserve('/temperature/0/foo', function (err, rsp) {
+cnode.cancelObserveReq('/temperature/0/foo', function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
 });
 ```

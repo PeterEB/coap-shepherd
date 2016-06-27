@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    _ = require('lodash'),
+    _ = require('busyman'),
     should = require('should'),
     coapdb = require('../lib/coapdb.js');
 

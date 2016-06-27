@@ -1,7 +1,6 @@
 var should = require('should'),
-    _ = require('lodash'),
-    CoapNode = require('../lib/coap-node'),
-    SmartObject = require('../lib/smartobject');
+    _ = require('busyman'),
+    CoapNode = require('../lib/coap-node');
 
 var devAttrs = {
         clientName: 'coap-client',
@@ -14,15 +13,13 @@ var devAttrs = {
     };
 
 var sObj1 = {
-        x: {
-            0: {
-                x0: 10,
-                x1: 20
-            },
-            1: {
-                x0: 100,
-                x1: 200
-            }
+        0: {
+            x0: 10,
+            x1: 20
+        },
+        1: {
+            x0: 100,
+            x1: 200
         }
     };
 
@@ -30,7 +27,7 @@ var fakeShp = { _newClientId: function () { return 1; } };
 
 var node = new CoapNode(fakeShp, devAttrs);
 
-node.so.addObjects(sObj1);
+node.so.x = sObj1;
 
 describe('Constructor Check', function () {
     it('CoapNode(shepherd, devAttrs)', function () {
@@ -41,7 +38,6 @@ describe('Constructor Check', function () {
         should(node.lifetime).be.eql(86400);
         should(node.status).be.eql('offline');
         should(node.objList).be.eql({ x: [0, 1] });
-        should(node.so).be.eql(sObj1);
         should(node._registered).be.false();
         should(node._streamObservers).be.eql({});
         should(node._lifeChecker).be.null();
@@ -108,44 +104,44 @@ describe('Function Check', function () {
         should(node._reqObj('GET', 'x')).be.eql(reqObj);
     });
 
-    it('read(path, callback) - not registered', function (done) {
-        node.read('x').fail(function (err) {
+    it('readReq(path, callback) - not registered', function (done) {
+        node.readReq('x').fail(function (err) {
             done();
         });
     });
 
-    it('write(path, value, callback) - not registered', function (done) {
-        node.write('x/y', 1).fail(function (err) {
+    it('writeReq(path, value, callback) - not registered', function (done) {
+        node.writeReq('x/y', 1).fail(function (err) {
             done();
         });
     });
 
-    it('execute(path, value, callback) - not registered', function (done) {
-        node.execute('x/y/z', []).fail(function (err) {
+    it('executeReq(path, value, callback) - not registered', function (done) {
+        node.executeReq('x/y/z', []).fail(function (err) {
             done();
         });
     });
 
-    it('discover(path, callback) - not registered', function (done) {
-        node.discover('x/y').fail(function (err) {
+    it('discoverReq(path, callback) - not registered', function (done) {
+        node.discoverReq('x/y').fail(function (err) {
             done();
         });
     });
 
-    it('writeAttr(path, value, callback) - not registered', function (done) {
-        node.writeAttrs('x/y', {}).fail(function (err) {
+    it('writeAttrReq(path, value, callback) - not registered', function (done) {
+        node.writeAttrsReq('x/y', {}).fail(function (err) {
             done();
         });
     });
 
-    it('observe(path, callback) - not registered', function (done) {
-        node.observe('x/y/z').fail(function (err) {
+    it('observeReq(path, callback) - not registered', function (done) {
+        node.observeReq('x/y/z').fail(function (err) {
             done();
         });
     });
 
-    it('cancelObserve(path, callback) - not registered', function (done) {
-        node.cancelObserve('x/y/z').fail(function (err) {
+    it('cancelObserveReq(path, callback) - not registered', function (done) {
+        node.cancelObserveReq('x/y/z').fail(function (err) {
             done();
         });
     });
@@ -166,7 +162,9 @@ describe('Function Check', function () {
             lifetime: 86400,
             version: '1.0.0',
             objList: { x: [0, 1] },
-            so: sObj1
+            so: {
+                x: sObj1
+            }
         },
         nDump = node.dump();
 
@@ -195,7 +193,9 @@ describe('Function Check', function () {
             lifetime: 86400,
             version: '1.0.0',
             objList: { x: [0, 1] },
-            so: sObj1
+            so: {
+                x: sObj1
+            }
         };
 
         node.dbSave().then(function (ndata) {
@@ -216,7 +216,9 @@ describe('Function Check', function () {
             lifetime: 86400,
             version: '1.0.0',
             objList: { x: [0, 1] },
-            so: sObj1
+            so: {
+                x: sObj1
+            }
         };
 
         node.dbRead().then(function (ndata) {

@@ -4,12 +4,13 @@
   "description": "An implementation of CoAP network and devices management.",
   "main": "index.js",
   "dependencies": {
+    "busyman": "^0.1.1",
     "coap": "^0.14.0",
-    "lodash": "^4.5.1",
     "lwm2m-id": "^1.2.3",
     "nedb": "^1.8.0",
     "network": "^0.1.3",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "smartobject": "0.0.2"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
