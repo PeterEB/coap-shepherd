@@ -19,7 +19,7 @@ module.exports = {
 
     // request should get response in the time.
     // default is 60 secs.
-    reqTimeout: 30,
+    reqTimeout: 60,
 
     // how often to check heartbeat.
     // it must be greater than client device heartbeatTime.
