@@ -3,13 +3,6 @@ var fs = require('fs'),
     should = require('should'),
     coapdb = require('../lib/coapdb.js');
 
-// clear the database file
-var dbPath = '../lib/database/coap.db';
-fs.exists(dbPath, function (isThere) {
-    if (isThere)
-        fs.unlink(dbPath);
-});
-
 var nodeMock1 = {
     clientName: 'mock01',
     locationPath: '1',
@@ -67,6 +60,14 @@ var nodeMock3 = {
 };
 
 describe('Insert Check', function () {
+    it('reset database', function (done) {
+        var dbPath = '../lib/database/coap.db';
+        fs.exists(dbPath, function (isThere) {
+            if (isThere) { fs.unlink(dbPath); }
+            done();
+        });
+    });
+
     it('insert nodeMock1', function (done) {
         coapdb.insert(nodeMock1).then(function (doc) {
             delete doc._id;

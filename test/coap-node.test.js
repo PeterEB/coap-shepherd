@@ -1,4 +1,5 @@
-var should = require('should'),
+var fs = require('fs'),
+    should = require('should'),
     _ = require('busyman'),
     CoapNode = require('../lib/coap-node');
 
@@ -30,6 +31,14 @@ var node = new CoapNode(fakeShp, devAttrs);
 node.so.x = sObj1;
 
 describe('Constructor Check', function () {
+    it('reset database', function (done) {
+        var dbPath = '../lib/database/coap.db';
+        fs.exists(dbPath, function (isThere) {
+            if (isThere) { fs.unlink(dbPath); }
+            done();
+        });
+    });
+
     it('CoapNode(shepherd, devAttrs)', function () {
         should(node.shepherd).be.equal(fakeShp);
         should(node.clientName).be.eql('coap-client');
@@ -83,13 +92,13 @@ describe('Signature Check', function () {
 });
 
 describe('Function Check', function () {
-    it('enableLifeChecker()', function (done) {
-        node.enableLifeChecker();
+    it('lifeCheck(true)', function (done) {
+        node.lifeCheck(true);
         if (node._lifeChecker !== null) done();
     });
 
-    it('disableLifeChecker()', function (done) {
-        node.disableLifeChecker();
+    it('lifeCheck(false)', function (done) {
+        node.lifeCheck(false);
         if (node._lifeChecker === null) done();
     });
 

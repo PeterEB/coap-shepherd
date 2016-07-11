@@ -110,9 +110,9 @@ function handler (msg) {
 //         setTimeout(function () { cnode.execute('/3303/0/5704', ['Peter', 'world'], reqHandler); }, 25000);
 
 // // observe test
-        // setTimeout(function () { cnode.observe('/3303/0/5700', reqHandler); }, 5000);
+//         setTimeout(function () { cnode.observe('/3303/0/5700', reqHandler); }, 5000);
 //         setTimeout(function () { cnode.observe('/3303/0/5701', reqHandler); }, 10000);
-//         setTimeout(function () { cnode.observe('/3303/0/5702', reqHandler); }, 15000);
+        // setTimeout(function () { cnode.observe('/3303/0/5702', reqHandler); }, 1000);
 //         setTimeout(function () { cnode.observe('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.observe('/3303/0/5704', reqHandler); }, 25000);
         // setTimeout(function () { cnode.observe('/3303/0', reqHandler); }, 3000);
