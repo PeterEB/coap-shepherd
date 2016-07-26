@@ -1,7 +1,9 @@
 var fs = require('fs'),
     _ = require('busyman'),
     should = require('should'),
-    coapdb = require('../lib/coapdb.js');
+    Coapdb = require('../lib/components/coapdb.js');
+
+var coapdb = new Coapdb('./lib/database/coap.db');
 
 var nodeMock1 = {
     clientName: 'mock01',
@@ -61,7 +63,7 @@ var nodeMock3 = {
 
 describe('Insert Check', function () {
     it('reset database', function (done) {
-        var dbPath = '../lib/database/coap.db';
+        var dbPath = './lib/database/coap.db';
         fs.exists(dbPath, function (isThere) {
             if (isThere) { fs.unlink(dbPath); }
             done();

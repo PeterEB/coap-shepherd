@@ -1,6 +1,6 @@
 var should = require('should'),
     _ = require('busyman'),
-    CoapNode = require('../lib/coap-node'),
+    CoapNode = require('../lib/components/coap-node'),
     shepherd = require('../lib/coap-shepherd');
 
 describe('Constructor Check', function () {

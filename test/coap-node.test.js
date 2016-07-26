@@ -1,7 +1,8 @@
 var fs = require('fs'),
     should = require('should'),
     _ = require('busyman'),
-    CoapNode = require('../lib/coap-node');
+    Coapdb = require('../lib/components/coapdb');
+    CoapNode = require('../lib/components/coap-node');
 
 var devAttrs = {
         clientName: 'coap-client',
@@ -24,7 +25,10 @@ var sObj1 = {
         }
     };
 
-var fakeShp = { _newClientId: function () { return 1; } };
+var fakeShp = { 
+    _newClientId: function () { return 1; },
+    _coapdb: new Coapdb('./lib/database/coap.db')
+};
 
 var node = new CoapNode(fakeShp, devAttrs);
 
@@ -32,7 +36,7 @@ node.so.x = sObj1;
 
 describe('Constructor Check', function () {
     it('reset database', function (done) {
-        var dbPath = '../lib/database/coap.db';
+        var dbPath = './lib/database/coap.db';
         fs.exists(dbPath, function (isThere) {
             if (isThere) { fs.unlink(dbPath); }
             done();
