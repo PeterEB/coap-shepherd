@@ -100,6 +100,7 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 * [cserver.start()](#API_start)
 * [cserver.stop()](#API_stop)
 * [cserver.permitJoin()](#API_permitJoin)
+* [cserver.listDevices()](#API_listDevices)
 * [cserver.find()](#API_find)
 * [cserver.remove()](#API_remove)
 * [cserver.announce()](#API_announce)
@@ -181,6 +182,80 @@ Allow or disallow devices to join the network.
 
 ```js
 cserver.permitJoin(300); 
+```
+
+*************************************************
+<a name="API_listDevices"></a>
+### cserver.listDevices()
+List records of the registered Client Devices.
+
+**Arguments:**  
+
+1. none
+
+**Returns:**  
+
+* (_Array_): Information of Client Devices. 
+
+**Examples:** 
+
+```js
+console.log(cserver.listDevices());
+[
+    { 
+        clientName: 'node1',
+        clientId: 1,
+        lifetime: 86400,
+        version: '1.0.0',
+        ip: '192.168.1.112',
+        mac: '00:0c:29:3c:fc:7d',
+        port: 56643,
+        objList: {
+            '1': ['0'],
+            '3303': ['0']
+        },
+        so: {
+            lwm2mServer: {
+                '0': { 
+                    lifetimev: 86400,
+                    defaultMinPeriod: 1,
+                    defaultMaxPeriod: 60
+                }
+            },
+            temperature: {
+                '0': { 
+                    sensorValue: 19,
+                    units: 'C'
+                }
+            }
+    }, { 
+        clientName: 'node2',
+        clientId: 2,
+        lifetime: 86400,
+        version: '1.0.0',
+        ip: '192.168.1.111',
+        mac: '30:1a:9f:5d:af:c8',
+        port: 56643,
+        objList: {
+            '1': ['0'],
+            '3303': ['0']
+        },
+        so: {
+            lwm2mServer: {
+                '0': { 
+                    lifetimev: 86400,
+                    defaultMinPeriod: 1,
+                    defaultMaxPeriod: 60
+                }
+            },
+            temperature: {
+                '0': { 
+                    sensorValue: 23,
+                    units: 'C'
+                }
+            }
+    }
+] 
 ```
 
 *************************************************

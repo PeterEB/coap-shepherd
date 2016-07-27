@@ -13,8 +13,10 @@
     "smartobject": "0.1.2"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "mocha": "^2.5.3",
-    "should": "^7.1.1"
+    "should": "^7.1.1",
+    "sinon": "^1.17.5"
   },
   "scripts": {
     "test": "make test-all"

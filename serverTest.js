@@ -1,27 +1,27 @@
 var shepherd = require('./index.js');
-var Discovery = require('udp-discovery').Discovery;
-var discover = new Discovery();
+// var Discovery = require('udp-discovery').Discovery;
+// var discover = new Discovery();
 
 var cnode;
 
-var name = 'coap-shepherd-ip-broadcast',
-    interval = 500,
-    available = true,
-    serv = {
-        port: 80,
-        proto: 'tcp',
-        addrFamily: 'IPv4'
-    };
+// var name = 'coap-shepherd-ip-broadcast',
+//     interval = 500,
+//     available = true,
+//     serv = {
+//         port: 80,
+//         proto: 'tcp',
+//         addrFamily: 'IPv4'
+//     };
 
 shepherd.on('ready', function () {
     console.log('>> coap-shepherd server start!');
     shepherd.permitJoin(3000);
 
-    discover.announce(name, serv, interval, available);
+    // discover.announce(name, serv, interval, available);
 
-    discover.on('MessageBus', function(event, data) {
+    // discover.on('MessageBus', function(event, data) {
         
-    });
+    // });
 });
 
 shepherd.on('ind', handler);
