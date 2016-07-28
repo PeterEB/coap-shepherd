@@ -100,7 +100,7 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 * [cserver.start()](#API_start)
 * [cserver.stop()](#API_stop)
 * [cserver.permitJoin()](#API_permitJoin)
-* [cserver.listDevices()](#API_listDevices)
+* [cserver.list()](#API_list)
 * [cserver.find()](#API_find)
 * [cserver.remove()](#API_remove)
 * [cserver.announce()](#API_announce)
@@ -185,8 +185,8 @@ cserver.permitJoin(300);
 ```
 
 *************************************************
-<a name="API_listDevices"></a>
-### cserver.listDevices()
+<a name="API_list"></a>
+### cserver.list()
 List records of the registered Client Devices.
 
 **Arguments:**  
@@ -213,21 +213,7 @@ console.log(cserver.listDevices());
         objList: {
             '1': ['0'],
             '3303': ['0']
-        },
-        so: {
-            lwm2mServer: {
-                '0': { 
-                    lifetimev: 86400,
-                    defaultMinPeriod: 1,
-                    defaultMaxPeriod: 60
-                }
-            },
-            temperature: {
-                '0': { 
-                    sensorValue: 19,
-                    units: 'C'
-                }
-            }
+        }
     }, { 
         clientName: 'node2',
         clientId: 2,
@@ -239,21 +225,7 @@ console.log(cserver.listDevices());
         objList: {
             '1': ['0'],
             '3303': ['0']
-        },
-        so: {
-            lwm2mServer: {
-                '0': { 
-                    lifetimev: 86400,
-                    defaultMinPeriod: 1,
-                    defaultMaxPeriod: 60
-                }
-            },
-            temperature: {
-                '0': { 
-                    sensorValue: 23,
-                    units: 'C'
-                }
-            }
+        }
     }
 ] 
 ```

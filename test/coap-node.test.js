@@ -1,8 +1,16 @@
 var fs = require('fs'),
     path = require('path'),
-    should = require('should'),
+    stream = require('stream'),
     _ = require('busyman'),
-    Coapdb = require('../lib/components/coapdb');
+    Q = require('q'),
+    chai = require('chai'),
+    sinon = require('sinon'),
+    sinonChai = require('sinon-chai'),
+    expect = chai.expect;
+
+chai.use(sinonChai);
+
+var Coapdb = require('../lib/components/coapdb'),
     CoapNode = require('../lib/components/coap-node');
 
 var devAttrs = {
@@ -27,337 +35,963 @@ var sObj = {
     };
 
 var dbPath = path.resolve('./test/database_test/coap.db'),
-    fakeShp = { 
-        emit: function () {},
-        _newClientId: function () { return 1; },
-        _coapdb: new Coapdb(dbPath)
-    },
-    node = new CoapNode(fakeShp, devAttrs);
+    fakeShp,
+    node,
+    reqObj,
+    rspObj;
 
-node.so.init('x', 0, sObj[0]);
-node.so.init('x', 1, sObj[1]);
+describe('coap-node', function () {
+    before(function () {
+        fakeShp = { 
+            emit: function () {},
+            request: function (req, callback) {
+                var deferred = Q.defer();
+                if (_.isEqual(req, reqObj)) 
+                    deferred.resolve(rspObj);
 
-describe('coap-node - Constructor Check', function () {
-    it('new CoapNode()', function () {
-        should(node.shepherd).be.equal(fakeShp);
-        should(node.clientName).be.eql('coap-client');
-        should(node.ip).be.eql('192.168.1.100');
-        should(node.version).be.eql('1.0.0');
-        should(node.lifetime).be.eql(86400);
-        should(node.status).be.eql('offline');
-        should(node.objList).be.eql({ x: [0, 1] });
-        should(node._registered).be.false();
-        should(node._streamObservers).be.eql({});
-        should(node._lifeChecker).be.null();
-        should(node._heartbeat).be.null();
-    });
-});
-
-describe('coap-node - Signature Check', function () {
-    it('new CoapNode()', function () {
-        (function () { return new CoapNode(fakeShp); }).should.throw();
-        (function () { return new CoapNode(fakeShp, 'x'); }).should.throw();
-        (function () { return new CoapNode(fakeShp, 1); }).should.throw();
-        (function () { return new CoapNode(fakeShp, []); }).should.throw();
-        (function () { return new CoapNode(fakeShp, {}); }).should.not.throw();
-        (function () { return new CoapNode(null, {}); }).should.throw();
-        (function () { return new CoapNode('x', {}); }).should.throw();
-        (function () { return new CoapNode('1', {}); }).should.throw();
-        (function () { return new CoapNode([], {}); }).should.throw();
-        (function () { return new CoapNode({}, {}); }).should.throw();
-    });
-
-    it('#._reqObj()', function () {
-        (function () { return node._reqObj('x'); }).should.throw();
-        (function () { return node._reqObj('x', 'x'); }).should.not.throw();
-        (function () { return node._reqObj('x', 1); }).should.throw();
-        (function () { return node._reqObj('x', []); }).should.throw();
-        (function () { return node._reqObj('x', {}); }).should.throw();
-        (function () { return node._reqObj(null, 'x'); }).should.throw();
-        (function () { return node._reqObj(1, 'x'); }).should.throw();
-        (function () { return node._reqObj([], 'x'); }).should.throw();
-        (function () { return node._reqObj({}, 'x'); }).should.throw();
-    });
-
-    it('#._setStatus()', function () {
-        (function () { return node._setStatus(); }).should.throw();
-        (function () { return node._setStatus('x'); }).should.throw();
-        (function () { return node._setStatus(1); }).should.throw();
-        (function () { return node._setStatus([]); }).should.throw();
-        (function () { return node._setStatus({}); }).should.throw();
-        (function () { return node._setStatus('online'); }).should.not.throw();
-        (function () { return node._setStatus('offline'); }).should.not.throw();
-    });
-});
-
-describe('coap-node - Functional Check', function () {
-    describe('#.lifeCheck()', function () {
-        it('true', function (done) {
-            node.lifeCheck(true);
-            if (node._lifeChecker !== null) done();
-        });
-
-        it('false', function (done) {
-            node.lifeCheck(false);
-            if (node._lifeChecker === null) done();
-        });
-    });
-
-    describe('#._reqObj()', function () {
-        it('_reqObj(method, pathname)', function () {
-            var reqObj = { 
-                hostname: '192.168.1.100', 
-                port: '5685', 
-                pathname: 'x', 
-                method: 'GET' 
-            };
-
-            should(node._reqObj('GET', 'x')).be.eql(reqObj);
-        });
-    });
-
-    describe('#.readReq()', function () {
-        it('readReq(path, callback) - not registered', function (done) {
-            node.readReq('x').fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.writeReq()', function () {
-        it('writeReq(path, value, callback) - not registered', function (done) {
-            node.writeReq('x/y', 1).fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.executeReq()', function () {
-        it('executeReq(path, value, callback) - not registered', function (done) {
-            node.executeReq('x/y/z', []).fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.discoverReq()', function () {
-        it('discoverReq(path, callback) - not registered', function (done) {
-            node.discoverReq('x/y').fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.writeAttrReq()', function () {
-        it('writeAttrReq(path, value, callback) - not registered', function (done) {
-            node.writeAttrsReq('x/y', {}).fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.observeReq()', function () {
-        it('observeReq(path, callback) - not registered', function (done) {
-            node.observeReq('x/y/z').fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.cancelObserveReq()', function () {
-        it('cancelObserveReq(path, callback) - not registered', function (done) {
-            node.cancelObserveReq('x/y/z').fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.ping()', function () {
-        it('ping(callback) - not registered', function (done) {
-            node.ping().fail(function (err) {
-                done();
-            });
-        });
-    });
-
-    describe('#.dump()', function () {
-        it('dump()', function () {
-            var dumper = {
-                clientName: 'coap-client',
-                clientId: 1,
-                ip: '192.168.1.100',
-                port: '5685',
-                mac: 'AA:BB:CC:DD:EE:00',
-                lifetime: 86400,
-                version: '1.0.0',
-                objList: { x: [0, 1] },
-                so: {
-                    x: sObj
-                }
+                return deferred.promise.nodeify(callback);
             },
-            nDump = node.dump();
+            _newClientId: function () { return 1; },
+            _coapdb: new Coapdb(dbPath)
+        };
+        node = new CoapNode(fakeShp, devAttrs);
 
-            delete nDump.joinTime;
-            
-            should(nDump).be.eql(dumper);
+        node.so.init('x', 0, sObj[0]);
+        node.so.init('x', 1, sObj[1]);
+    });
+
+    describe('Constructor Check', function () {
+        it('new CoapNode()', function () {
+            expect(node.shepherd).to.be.equal(fakeShp);
+            expect(node.clientName).to.be.eql('coap-client');
+            expect(node.ip).to.be.eql('192.168.1.100');
+            expect(node.version).to.be.eql('1.0.0');
+            expect(node.lifetime).to.be.eql(86400);
+            expect(node.status).to.be.eql('offline');
+            expect(node.objList).to.be.eql({ x: [0, 1] });
+            expect(node._registered).to.be.false;
+            expect(node._streamObservers).to.be.eql({});
+            expect(node._lifeChecker).to.be.eql(null);
+            expect(node._heartbeat).to.be.eql(null);
         });
     });
 
-    describe('#._setStatus()', function () {
-        it('_setStatus(status) - online', function (done) {
-            node._setStatus('online');
-            if (node.status === 'online') done();
+    describe('Signature Check', function () {
+        it('new CoapNode()', function () {
+            expect(function () { return new CoapNode(fakeShp); }).to.throw();
+            expect(function () { return new CoapNode(fakeShp, 'x'); }).to.throw();
+            expect(function () { return new CoapNode(fakeShp, 1); }).to.throw();
+            expect(function () { return new CoapNode(fakeShp, []); }).to.throw();
+            expect(function () { return new CoapNode(null, {}); }).to.throw();
+            expect(function () { return new CoapNode('x', {}); }).to.throw();
+            expect(function () { return new CoapNode('1', {}); }).to.throw();
+            expect(function () { return new CoapNode([], {}); }).to.throw();
+            expect(function () { return new CoapNode({}, {}); }).to.throw();
+
+            expect(function () { return new CoapNode(fakeShp, {}); }).not.to.throw();
         });
 
-        it('_setStatus(status) - offline', function (done) {
-            node._setStatus('offline');
-            if (node.status === 'offline') done();
+        it('#.lifeCheck()', function () {
+            expect(function () { return node.lifeCheck(); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(undefined); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(null); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(NaN); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(10); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck('xx'); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck([]); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck({}); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(new Date()); }).to.throw(TypeError);
+            expect(function () { return node.lifeCheck(function () {}); }).to.throw(TypeError);
+
+            expect(function () { return node.lifeCheck(true); }).not.to.throw(TypeError);
         });
-    });
 
-    describe('#.dbSave()', function () {
-        it('dbSave(callback)', function (done) {
-            var dumper = {
-                clientName: 'coap-client',
-                clientId: 1,
-                ip: '192.168.1.100',
-                port: '5685',
-                mac: 'AA:BB:CC:DD:EE:00',
-                lifetime: 86400,
-                version: '1.0.0',
-                objList: { x: [0, 1] },
-                so: {
-                    x: sObj
-                }
-            };
+        it('#._reqObj()', function () {
+            expect(function () { return node._reqObj('x'); }).to.throw();
+            expect(function () { return node._reqObj('x', 1); }).to.throw();
+            expect(function () { return node._reqObj('x', []); }).to.throw();
+            expect(function () { return node._reqObj('x', {}); }).to.throw();
+            expect(function () { return node._reqObj(null, 'x'); }).to.throw();
+            expect(function () { return node._reqObj(1, 'x'); }).to.throw();
+            expect(function () { return node._reqObj([], 'x'); }).to.throw();
+            expect(function () { return node._reqObj({}, 'x'); }).to.throw();
 
-            node.dbSave().then(function (ndata) {
-                delete ndata._id;
-                delete ndata.joinTime;
+            expect(function () { return node._reqObj('x', 'x'); }).not.to.throw();
+        });
 
-                if (_.isEqual(ndata, dumper)) done();
+        it('#._setStatus()', function () {
+            expect(function () { return node._setStatus(); }).to.throw();
+            expect(function () { return node._setStatus('x'); }).to.throw();
+            expect(function () { return node._setStatus(1); }).to.throw();
+            expect(function () { return node._setStatus([]); }).to.throw();
+            expect(function () { return node._setStatus({}); }).to.throw();
+
+            expect(function () { return node._setStatus('online'); }).not.to.throw();
+            expect(function () { return node._setStatus('offline'); }).not.to.throw();
+        });
+
+        // Asynchronous APIs
+        describe('#.readReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.readReq('x').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.readReq('x').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.readReq([]).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.writeReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.writeReq('x/y', 1).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.writeReq('x/y', 1).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.writeReq([], 1).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if value is undefined', function (done) {
+                node.writeReq('x/y/z', undefined).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is object', function (done) {
+                node.writeReq('x', 10).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.executeReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.executeReq('x/y/z', []).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.executeReq('x/y/z', []).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.executeReq([], []).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if args is not an array', function (done) {
+                node.executeReq([], 10).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.discoverReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.discoverReq('x/y').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.discoverReq('x/y').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.discoverReq([]).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.writeAttrReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.writeAttrsReq('x/y', {}).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.writeAttrsReq('x/y', {}).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.writeAttrsReq([], {}).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if attrs is not an object', function (done) {
+                node.writeAttrsReq('x/y', 10).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.observeReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.observeReq('x/y/z').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.observeReq('x/y/z').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.observeReq([]).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.cancelObserveReq()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.cancelObserveReq('x/y/z').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if status is offline', function (done) {
+                node._registered = true;
+                node._setStatus('offline');
+                node.cancelObserveReq('x/y/z').fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if path is not a string', function (done) {
+                node._setStatus('online');
+                node.cancelObserveReq([]).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#.ping()', function () {
+            it('should return err if not registered', function (done) {
+                node._registered = false;
+                node.ping().fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#._updateObjectInstance()', function () { 
+            it('should return err if oid is not a string or a number', function (done) {
+                node._updateObjectInstance([], 0, {}).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if iid is not a string or a number', function (done) {
+                node._updateObjectInstance('x', [], {}).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if data is not an object', function (done) {
+                node._updateObjectInstance('x', [], {}).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#._updateResource()', function () { 
+            it('should return err if oid is not a string or a number', function (done) {
+                node._updateResource([], 0, 'z', 10).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if iid is not a string or a number', function (done) {
+                node._updateResource('x', [], 'z', 10).fail(function (err) {
+                    done();
+                });
+            });
+
+            it('should return err if rid is not a string or a number', function (done) {
+                node._updateResource('x', 0, [], 10).fail(function (err) {
+                    done();
+                });
+            });
+        });
+
+        describe('#._updateAttrs()', function () { 
+            it('should return err if attrs is not an object', function (done) {
+                node._updateObjectInstance('x').fail(function (err) {
+                    done();
+                });
             });
         });
     });
 
-    describe('#.dbRead()', function () {
-        it('dbRead(callback)', function (done) {
-            var dumper = {
-                clientName: 'coap-client',
-                clientId: 1,
-                ip: '192.168.1.100',
-                port: '5685',
-                mac: 'AA:BB:CC:DD:EE:00',
-                lifetime: 86400,
-                version: '1.0.0',
-                objList: { x: [0, 1] },
-                so: {
-                    x: sObj
-                }
-            };
+    describe('Functional Check', function () {
+        before(function () {
+            node._registered = true;
+            node.status = 'online';
+        });
 
-            node.dbRead().then(function (ndata) {
-                delete ndata.joinTime;
+        describe('#.lifeCheck()', function () {
+            it('should open lifeCheck', function (done) {
+                node.lifeCheck(true);
+                if (node._lifeChecker !== null) done();
+            });
 
-                if (_.isEqual(ndata, dumper)) done();
+            it('should close lifeCheck', function (done) {
+                node.lifeCheck(false);
+                if (node._lifeChecker === null) done();
             });
         });
-    });
 
-    describe('#._updateAttrs()', function () {
-        it('_updateAttrs(attrs, callback)', function (done) {
-            var attrs = { lifetime: 60000, version: '1.0.1' };
-            node._updateAttrs(attrs).then(function (diff) {
-                if (_.isEqual(diff, attrs)) done();
-            });
-        });
-    });
-    
-    describe('#._updateObjectInstance()', function () {
-        it('_updateObjectInstance(oid, iid, data, callback)', function (done) {
-            var data = {
-                    x0: 9,
-                    x1: 19
+        describe('#._reqObj()', function () {
+            it('should return reqObj', function () {
+                var obj = { 
+                    hostname: '192.168.1.100', 
+                    port: '5685', 
+                    pathname: 'x', 
+                    method: 'GET' 
                 };
 
-            node._updateObjectInstance('x', 0, data).then(function (diff) {
-                if (_.isEqual(diff, data)) done();
+                expect(node._reqObj('GET', 'x')).to.be.eql(obj);
             });
         });
 
-        it('_updateObjectInstance(oid, iid, data, callback) - bad path', function (done) {
-            var data = {
-                    x0: 55,
-                    x1: 555
+        describe('#.readReq()', function () {
+            it('should read Resource and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET'
+                };
+                rspObj = {
+                    code: '2.05',
+                    payload: 10
                 };
 
-            node._updateObjectInstance('a', 0, data).fail(function () {
-                done();
+                node.readReq('/x/0/x0').then(function (rsp) {
+                    if (rsp.status === '2.05' && rsp.data === 10)
+                        done();
+                });
             });
-        });
 
-        it('_updateObjectInstance(oid, iid, data, callback) - bad data', function (done) {
-            var data = {
-                    a: 9,
-                    b: 19
+            it('should read Object Instance and return status 2.05', function (done) {
+                var obj = {
+                    x0: 10,
+                    x1: 20
                 };
 
-            node._updateObjectInstance('x', 0, data).fail(function () {
-                done();
-            });
-        });
-    });
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'GET'
+                };
+                rspObj = {
+                    code: '2.05',
+                    payload: obj
+                };
 
-    describe('#._updateResource()', function () {
-        it('_updateResource(oid, iid, rid, data, callback)', function (done) {
-            node._updateResource('x', 0, 'x0', 99).then(function (diff) {
-                if (diff === 99) done();
+                node.readReq('/x/0').then(function (rsp) {
+                    if (rsp.status === '2.05' && rsp.data === obj)
+                        done();
+                });
             });
-        });
 
-        it('_updateResource(oid, iid, rid, data, callback) - bad path', function (done) {
-            node._updateResource('x', 0, 'xx', 99).fail(function () {
-                done();
-            });
-        });
-    });
-
-    describe('#._updateSoAndDb()', function () {
-        it('_updateSoAndDb(path, data, callback) - object', function (done) {
-            var data = {
+            it('should read Object and return status 2.05', function (done) {
+                var obj = {
+                    0: {
+                        x0: 10,
+                        x1: 20
+                    },
                     1: {
-                        x0: 33,
-                        x1: 333
+                        x0: 100,
+                        x1: 200
                     }
                 };
-            node._updateSoAndDb('/x', data).then(function (diff) {
-                if (_.isEqual(diff[0], data[1])) done();
-            });
-        });
 
-        it('_updateSoAndDb(path, data, callback) - instance', function (done) {
-            var data = {
-                    x0: 109,
-                    x1: 209
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x',
+                    method: 'GET'
                 };
-            node._updateSoAndDb('/x/1', data).then(function (diff) {
-                if (_.isEqual(diff, data)) done();
+                rspObj = {
+                    code: '2.05',
+                    payload: obj
+                };
+
+                node.readReq('/x').then(function (rsp) {
+                    if (rsp.status === '2.05' && rsp.data === obj)
+                        done();
+                });
             });
         });
 
-        it('_updateSoAndDb(path, data, callback) - resourse', function (done) {
-            node._updateSoAndDb('/x/1/x0', 199).then(function (diff) {
-                if (diff === 199) done();
+        describe('#.writeReq()', function () {
+            it('should write Resource and return status 2.04', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'PUT',
+                    payload: 10,
+                    options: {
+                        'Content-Format': 'text/plain'
+                    }
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.writeReq('/x/0/x0', 10).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
+            });
+
+            it('should write Object Instance and return status 2.04', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'PUT',
+                    payload: { 'e': [
+                        { 'n': 'x0', 'v': 10 }, 
+                        { 'n': 'x1', 'v': 20 } 
+                    ]},
+                    options: {
+                        'Content-Format': 'application/json'
+                    }
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.writeReq('/x/0', { x0: 10, x1: 20 }).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
             });
         });
-    });
 
-    describe('#.dbRemove()', function () {
-        it('dbRemove(callback)', function (done) {
-            node.dbRemove().then(function () {
-                return node.dbRead();
-            }).fail(function (err) {
-                done();
+        describe('#.executeReq()', function () {
+            it('should execute Resource and return status 2.04', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'POST',
+                    payload: '10,20'
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.executeReq('/x/0/x0', [ 10, 20 ]).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
+            });
+        });
+
+        describe('#.discoverReq()', function () {
+            it('should discover Resource and return status 2.05', function (done) {
+                var obj = {
+                    attrs: { 
+                        pmin: 10, 
+                        pmax: 60
+                    }
+                };
+
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    options: {
+                        Accept: 'application/link-format'
+                    }
+                };
+                rspObj = {
+                    headers: {
+                        'Content-Format': 'application/link-format'
+                    },
+                    code: '2.05',
+                    payload: '</x/0/x0>;pmin=10;pmax=60'
+                };
+
+                node.discoverReq('/x/0/x0').then(function (rsp) {
+                    if (rsp.status === '2.05' && _.isEqual(rsp.data, obj))
+                        done();
+                });
+            });
+
+            it('should discover Object Instance and return status 2.05', function (done) {
+                var obj = {
+                    attrs: { 
+                        pmin: 10, 
+                        pmax: 60
+                    },
+                    resrcList: {
+                        0: [ 'x0', 'x1' ]
+                    }
+                };
+
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'GET',
+                    options: {
+                        Accept: 'application/link-format'
+                    }
+                };
+                rspObj = {
+                    headers: {
+                        'Content-Format': 'application/link-format'
+                    },
+                    code: '2.05',
+                    payload: '</x/0>;pmin=10;pmax=60,</x/0/x0>,</x/0/x1>'
+                };
+
+                node.discoverReq('/x/0').then(function (rsp) {
+                    if (rsp.status === '2.05' && _.isEqual(rsp.data, obj))
+                        done();
+                });
+            });
+
+            it('should discover Object and return status 2.05', function (done) {
+                var obj = {
+                    attrs: { 
+                        pmin: 10, 
+                        pmax: 60
+                    },
+                    resrcList: {
+                        0: [ 'x0', 'x1' ],
+                        1: [ 'x0', 'x1' ],
+                    }
+                };
+
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x',
+                    method: 'GET',
+                    options: {
+                        Accept: 'application/link-format'
+                    }
+                };
+                rspObj = {
+                    headers: {
+                        'Content-Format': 'application/link-format'
+                    },
+                    code: '2.05',
+                    payload: '</x>;pmin=10;pmax=60,</x/0/x0>,</x/0/x1>,</x/1/x0>,</x/1/x1>'
+                };
+
+                node.discoverReq('/x').then(function (rsp) {
+                    if (rsp.status === '2.05' && _.isEqual(rsp.data, obj))
+                        done();
+                });
+            });
+        });
+
+        describe('#.writeAttrsReq()', function () {
+            it('should write Resource Attrs and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'PUT',
+                    query: 'pmin=10&pmax=60'
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.writeAttrsReq('/x/0/x0', { pmin: 10, pmax: 60 }).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
+            });
+
+            it('should write Object Instance Attrs and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'PUT',
+                    query: 'pmin=10&pmax=60'
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.writeAttrsReq('/x/0', { pmin: 10, pmax: 60 }).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
+            });
+
+            it('should write Object Attrs and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x',
+                    method: 'PUT',
+                    query: 'pmin=10&pmax=60'
+                };
+                rspObj = {
+                    code: '2.04'
+                };
+
+                node.writeAttrsReq('/x', { pmin: 10, pmax: 60 }).then(function (rsp) {
+                    if (rsp.status === '2.04')
+                        done();
+                });
+            });
+        });
+
+        describe('#.observeReq()', function () {
+            it('should observe Resource and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    observe: true
+                };
+                rspObj = new stream.Readable();
+                rspObj.headers = { 'Content-Format': 'text/plain' };
+                rspObj.code = '2.05';
+                rspObj.payload = 10;
+                rspObj.close = function () {};
+
+                node.observeReq('/x/0/x0').then(function (rsp) {
+                    if (rsp.status === '2.05' && rsp.data === 10)
+                        done();
+                });
+            });
+
+            it('should observe Resource and return status 2.05', function (done) {
+                var obj = {
+                    x0: 10,
+                    x1: 20
+                };
+
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'GET',
+                    observe: true
+                };
+                rspObj = new stream.Readable();
+
+                rspObj.headers = { 'Content-Format': 'text/plain' };
+                rspObj.code = '2.05';
+                rspObj.payload = obj;
+                rspObj.close = function () {};
+
+                node.observeReq('/x/0').then(function (rsp) {
+                    if (rsp.status === '2.05' && _.isEqual(rsp.data, obj))
+                        done();
+                });
+            });
+        });
+
+        describe('#.cancelObserveReq()', function () {
+            it('should cancel Resource observe and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    observe: false
+                };
+                rspObj = {
+                    code: '2.05'
+                };
+
+                node.cancelObserveReq('/x/0/x0').then(function (rsp) {
+                    if (rsp.status === '2.05')
+                        done();
+                });
+            });
+
+            it('should cancel Object Instance observe and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0',
+                    method: 'GET',
+                    observe: false
+                };
+                rspObj = {
+                    code: '2.05'
+                };
+
+                node.cancelObserveReq('/x/0').then(function (rsp) {
+                    if (rsp.status === '2.05')
+                        done();
+                });
+            });
+        });
+
+        describe('#.ping()', function () {
+            it('should ping cnode and return status 2.05', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/ping',
+                    method: 'POST'
+                };
+                rspObj = {
+                    code: '2.05'
+                };
+
+                node.ping().then(function (rsp) {
+                    if (rsp.status === '2.05')
+                        done();
+                });
+            });
+        });
+
+        describe('#.dump()', function () {
+            it('should return node record', function () {
+                var dumper = {
+                    clientName: 'coap-client',
+                    clientId: 1,
+                    ip: '192.168.1.100',
+                    port: '5685',
+                    mac: 'AA:BB:CC:DD:EE:00',
+                    lifetime: 86400,
+                    version: '1.0.0',
+                    objList: { x: [0, 1] },
+                    so: {
+                        x: sObj
+                    }
+                },
+                nDump = node.dump();
+
+                delete nDump.joinTime;
+                
+                expect(nDump).to.be.eql(dumper);
+            });
+        });
+
+        describe('#._setStatus()', function () {
+            it('should set node status to online', function (done) {
+                node._setStatus('online');
+                if (node.status === 'online') done();
+            });
+
+            it('should set node status to offline', function (done) {
+                node._setStatus('offline');
+                if (node.status === 'offline') done();
+            });
+        });
+
+        describe('#.dbSave()', function () {
+            it('should save node record to db, and return node record', function (done) {
+                var dumper = {
+                    clientName: 'coap-client',
+                    clientId: 1,
+                    ip: '192.168.1.100',
+                    port: '5685',
+                    mac: 'AA:BB:CC:DD:EE:00',
+                    lifetime: 86400,
+                    version: '1.0.0',
+                    objList: { x: [0, 1] },
+                    so: {
+                        x: sObj
+                    }
+                };
+
+                node.dbSave().then(function (ndata) {
+                    delete ndata._id;
+                    delete ndata.joinTime;
+
+                    if (_.isEqual(ndata, dumper)) done();
+                });
+            });
+        });
+
+        describe('#.dbRead()', function () {
+            it('should read node record from db, and return node record', function (done) {
+                var dumper = {
+                    clientName: 'coap-client',
+                    clientId: 1,
+                    ip: '192.168.1.100',
+                    port: '5685',
+                    mac: 'AA:BB:CC:DD:EE:00',
+                    lifetime: 86400,
+                    version: '1.0.0',
+                    objList: { x: [0, 1] },
+                    so: {
+                        x: sObj
+                    }
+                };
+
+                node.dbRead().then(function (ndata) {
+                    delete ndata.joinTime;
+                    if (_.isEqual(ndata, dumper)) done();
+                });
+            });
+        });
+
+        describe('#._updateAttrs()', function () {
+            it('should update node attrs, and return diff', function (done) {
+                var attrs = { lifetime: 60000, version: '1.0.1' };
+                node._updateAttrs(attrs).then(function (diff) {
+                    if (_.isEqual(diff, attrs)) done();
+                });
+            });
+        });
+        
+        describe('#._updateObjectInstance()', function () {
+            it('should update Object Instance, and return diff', function (done) {
+                var data = {
+                        x0: 9,
+                        x1: 19
+                    };
+
+                node._updateObjectInstance('x', 0, data).then(function (diff) {
+                    if (_.isEqual(diff, data)) done();
+                });
+            });
+
+            it('should not update Object Instance, and return bad path err', function (done) {
+                var data = {
+                        x0: 55,
+                        x1: 555
+                    };
+
+                node._updateObjectInstance('a', 0, data).fail(function () {
+                    done();
+                });
+            });
+
+            it('should not update Object Instance, and return bad data err', function (done) {
+                var data = {
+                        a: 9,
+                        b: 19
+                    };
+
+                node._updateObjectInstance('x', 0, data).fail(function () {
+                    done();
+                });
+            });
+        });
+
+        describe('#._updateResource()', function () {
+            it('should update Resource, and return diff', function (done) {
+                node._updateResource('x', 0, 'x0', 99).then(function (diff) {
+                    if (diff === 99) done();
+                });
+            });
+
+            it('should not update Resource, and return bad data err', function (done) {
+                node._updateResource('x', 0, 'xx', 99).fail(function () {
+                    done();
+                });
+            });
+        });
+
+        describe('#._updateSoAndDb()', function () {
+            it('should update Object and db, and return diff', function (done) {
+                var data = {
+                        1: {
+                            x0: 33,
+                            x1: 333
+                        }
+                    };
+                node._updateSoAndDb('/x', data).then(function (diff) {
+                    if (_.isEqual(diff[0], data[1])) done();
+                });
+            });
+
+            it('should update Object Instance and db, and return diff', function (done) {
+                var data = {
+                        x0: 109,
+                        x1: 209
+                    };
+                node._updateSoAndDb('/x/1', data).then(function (diff) {
+                    if (_.isEqual(diff, data)) done();
+                });
+            });
+
+            it('should update Resourse and db, and return diff', function (done) {
+                node._updateSoAndDb('/x/1/x0', 199).then(function (diff) {
+                    if (diff === 199) done();
+                });
+            });
+        });
+
+        describe('#.dbRemove()', function () {
+            it('should read node record in db', function (done) {
+                node.dbRemove().then(function () {
+                    return node.dbRead();
+                }).fail(function (err) {
+                    done();
+                });
             });
         });
     });
