@@ -1,6 +1,6 @@
 {
   "name": "coap-shepherd",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "An implementation of CoAP network and devices management.",
   "main": "index.js",
   "dependencies": {
@@ -15,7 +15,6 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3",
-    "should": "^7.1.1",
     "sinon": "^1.17.5",
     "sinon-chai": "^2.8.0"
   },

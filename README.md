@@ -110,13 +110,13 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 
 CoapNode is the class to create software endpoints of the remote Client Devices at server-side. In this document, **cnode** denotes an instance of CoapNode class. You can invoke methods on a `cnode` to operate the remote device.  
 
-* [cnode.readReq()](#API_read)
-* [cnode.discoverReq()](#API_discover)
-* [cnode.writeReq()](#API_write)
-* [cnode.writeAttrsReq()](#API_writeAttrs)
-* [cnode.executeReq()](#API_execute)
-* [cnode.observeReq()](#API_observe)
-* [cnode.cancelObserveReq()](#API_cancelObserve)
+* [cnode.readReq()](#API_readReq)
+* [cnode.discoverReq()](#API_discoverReq)
+* [cnode.writeReq()](#API_writeReq)
+* [cnode.writeAttrsReq()](#API_writeAttrsReq)
+* [cnode.executeReq()](#API_executeReq)
+* [cnode.observeReq()](#API_observeReq)
+* [cnode.cancelObserveReq()](#API_cancelObserveReq)
 * [cnode.ping()](#API_ping)
 * [cnode.dump()](#API_dump)
 
@@ -200,7 +200,9 @@ List records of the registered Client Devices.
 **Examples:** 
 
 ```js
-console.log(cserver.listDevices());
+console.log(cserver.list());
+
+/*
 [
     { 
         clientName: 'node1',
@@ -228,6 +230,7 @@ console.log(cserver.listDevices());
         }
     }
 ] 
+*/
 ```
 
 *************************************************
