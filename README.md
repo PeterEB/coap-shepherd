@@ -122,7 +122,7 @@ CoapNode is the class to create software endpoints of the remote Client Devices 
 
 *************************************************
 ## CoapShepherd Class
-Server configuration is read from file `config.js` in the lib folder of this module.  
+Server configuration is read from file `config.js` in the `lib` folder of this module.  
 
 <a name="API_start"></a>
 ### cserver.start([callback])
