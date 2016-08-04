@@ -350,7 +350,7 @@ describe('coap-shepherd', function () {
 
                 emitClintReqMessage(shepherd, {
                     code: '0.02',
-                    method: 'PUT',
+                    method: 'POST',
                     url: '/rd/1?lt=87654',
                     rsinfo: {
                         address: '127.0.0.1',
