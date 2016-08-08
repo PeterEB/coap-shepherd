@@ -299,11 +299,11 @@ describe('coap-shepherd', function () {
                     regCallback = function (msg) {
                         if (msg.type === 'registered') {
                             cnode = msg.data;
-                            _readAllResourceStub.restore();
-                            observeReqStub.restore();
                             expect(rsp.setOption).to.have.been.calledWith('Location-Path', cnode.locationPath);
                             expect(rsp.end).to.have.been.calledWith('');
                             if (shepherd.find('cnode02') === cnode) {
+                                _readAllResourceStub.restore();
+                                observeReqStub.restore();
                                 shepherd.removeListener('ind', regCallback);
                                 done();
                             }
@@ -388,6 +388,122 @@ describe('coap-shepherd', function () {
                     rsinfo: {
                         address: '127.0.0.1',
                         port: '5687'
+                    },
+                    payload: '',
+                    headers: {}
+                }, rsp);
+            });
+        });
+
+        describe('#checkOut cnode', function () {
+            it('should chect out and cnode status changed to sleep', function (done) {
+                var rsp = {},
+                    cnode,
+                    outCallback = function (msg) {
+                        if (msg.type === 'sleep') {
+                            clientName = msg.data;
+                            expect(rsp.end).to.have.been.calledWith('');
+                            if (clientName === 'cnode01') {
+                                expect(shepherd.find('cnode01').status).to.be.eql('sleep');
+                                shepherd.removeListener('ind', outCallback);
+                                done();
+                            }
+                        }
+                    };
+
+                rsp.end = sinon.spy();
+
+                shepherd.on('ind', outCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.04',
+                    method: 'PUT',
+                    url: '/rd/1?chk=out',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5688'
+                    },
+                    payload: '',
+                    headers: {}
+                }, rsp);
+            });
+
+            it('should return error when device is sleeping', function (done) {
+                var cnode = shepherd.find('cnode01');
+
+                cnode.readReq('/x/0/x0', function (err) {
+                    if (err) done();
+                });
+            });
+
+            it ('should chect out and cnode status changed to sleep with duration', function (done) {
+                var rsp = {},
+                    cnode,
+                    outCallback = function (msg) {
+                        if (msg.type === 'offline') {
+                            clientName = msg.data;
+                            expect(rsp.end).to.have.been.calledWith('');
+                            if (clientName === 'cnode01') {
+                                expect(shepherd.find('cnode01').status).to.be.eql('offline');
+                                shepherd.removeListener('ind', outCallback);
+                                done();
+                            }
+                        }
+                    };
+
+                rsp.end = sinon.spy();
+
+                shepherd.on('ind', outCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.04',
+                    method: 'PUT',
+                    url: '/rd/1?chk=out&t=1',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5688'
+                    },
+                    payload: '',
+                    headers: {}
+                }, rsp);
+            });
+        });
+
+        describe('#checkIn cnode', function () {
+            it('should chect out and cnode status changed to online', function (done) {
+                var observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: 'hb'
+                        });
+                    }),
+                    rsp = {},
+                    cnode,
+                    inCallback = function (msg) {
+                        if (msg.type === 'online') {
+                            clientName = msg.data;
+                            expect(rsp.end).to.have.been.calledWith('');
+                            if (clientName === 'cnode01') {
+                                observeReqStub.restore();
+                                expect(shepherd.find('cnode01').status).to.be.eql('online');
+                                expect(shepherd.find('cnode01').port).to.be.eql('5690');
+                                shepherd.removeListener('ind', inCallback);
+                                done();
+                            }
+                        }
+                    };
+
+                rsp.end = sinon.spy();
+
+                shepherd.on('ind', inCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.04',
+                    method: 'PUT',
+                    url: '/rd/1?chk=in',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5690'
                     },
                     payload: '',
                     headers: {}

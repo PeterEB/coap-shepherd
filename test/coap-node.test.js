@@ -106,6 +106,21 @@ describe('coap-node', function () {
             expect(function () { return node.lifeCheck(true); }).not.to.throw(TypeError);
         });
 
+        it('#.sleepCheck()', function () {
+            expect(function () { return node.sleepCheck(); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(undefined); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(null); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(NaN); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(10); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck('xx'); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck([]); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck({}); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(new Date()); }).to.throw(TypeError);
+            expect(function () { return node.sleepCheck(function () {}); }).to.throw(TypeError);
+
+            expect(function () { return node.sleepCheck(true); }).not.to.throw(TypeError);
+        });
+
         it('#._reqObj()', function () {
             expect(function () { return node._reqObj('x'); }).to.throw();
             expect(function () { return node._reqObj('x', 1); }).to.throw();
@@ -396,6 +411,23 @@ describe('coap-node', function () {
             it('should close lifeCheck', function (done) {
                 node.lifeCheck(false);
                 if (node._lifeChecker === null) done();
+            });
+        });
+
+        describe('#.sleepCheck()', function () {
+            it('should open sleepCheck', function (done) {
+                node.sleepCheck(true);
+                if (node._sleepChecker === null) done();
+            });
+
+            it('should open sleepCheck', function (done) {
+                node.sleepCheck(true, 10);
+                if (node._sleepChecker !== null) done();
+            });
+
+            it('should close sleepCheck', function (done) {
+                node.sleepCheck(false);
+                if (node._sleepChecker === null) done();
             });
         });
 
