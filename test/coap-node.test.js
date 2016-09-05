@@ -338,10 +338,10 @@ describe('coap-node', function () {
             });
         });
 
-        describe('#.ping()', function () {
+        describe('#.pingReq()', function () {
             it('should return err if not registered', function (done) {
                 node._registered = false;
-                node.ping().fail(function (err) {
+                node.pingReq().fail(function (err) {
                     done();
                 });
             });
@@ -827,7 +827,7 @@ describe('coap-node', function () {
             });
         });
 
-        describe('#.ping()', function () {
+        describe('#.pingReq()', function () {
             it('should ping cnode and return status 2.05', function (done) {
                 reqObj = {
                     hostname: '192.168.1.100',
@@ -839,7 +839,7 @@ describe('coap-node', function () {
                     code: '2.05'
                 };
 
-                node.ping().then(function (rsp) {
+                node.pingReq().then(function (rsp) {
                     if (rsp.status === '2.05')
                         done();
                 });

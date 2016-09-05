@@ -65,7 +65,7 @@ function errHandler (err) {
 function handler (msg) {
     console.log(msg);
     
-    if (msg.type === 'registered') {
+    if (msg.type === 'devIncoming') {
         cnode = shepherd.find('nodeTest');
         
 // // read test

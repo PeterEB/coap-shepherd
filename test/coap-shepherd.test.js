@@ -100,10 +100,6 @@ describe('coap-shepherd', function () {
 
         describe('#.permitJoin()', function () {
             it('should throw TypeError if time is not a number', function () {
-                expect(function () { return shepherd.permitJoin(); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(NaN); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin('xx'); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin([]); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin({}); }).to.throw(TypeError);
@@ -111,6 +107,9 @@ describe('coap-shepherd', function () {
                 expect(function () { return shepherd.permitJoin(new Date()); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin(function () {}); }).to.throw(TypeError);
 
+                expect(function () { return shepherd.permitJoin(); }).not.to.throw(TypeError);
+                expect(function () { return shepherd.permitJoin(undefined); }).not.to.throw(TypeError);
+                expect(function () { return shepherd.permitJoin(null); }).not.to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin(10); }).not.to.throw(TypeError);
             });
         });
@@ -249,8 +248,8 @@ describe('coap-shepherd', function () {
                     rsp = {},
                     cnode,
                     regCallback = function (msg) {
-                        if (msg.type === 'registered') {
-                            cnode = msg.data;
+                        if (msg.type === 'devIncoming') {
+                            cnode = msg.cnode;
                             _readAllResourceStub.restore();
                             observeReqStub.restore();
                             expect(rsp.setOption).to.have.been.calledWith('Location-Path', cnode.locationPath);
@@ -297,8 +296,8 @@ describe('coap-shepherd', function () {
                     rsp = {},
                     cnode,
                     regCallback = function (msg) {
-                        if (msg.type === 'registered') {
-                            cnode = msg.data;
+                        if (msg.type === 'devIncoming') {
+                            cnode = msg.cnode;
                             expect(rsp.setOption).to.have.been.calledWith('Location-Path', cnode.locationPath);
                             expect(rsp.end).to.have.been.calledWith('');
                             if (shepherd.find('cnode02') === cnode) {
@@ -334,7 +333,7 @@ describe('coap-shepherd', function () {
                 var rsp = {},
                     cnode,
                     upCallback = function (msg) {
-                        if (msg.type === 'update') {
+                        if (msg.type === 'devUpdate') {
                             diff = msg.data;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (diff.lifetime == 87654) {
@@ -367,8 +366,8 @@ describe('coap-shepherd', function () {
                 var rsp = {},
                     cnode,
                     deCallback = function (msg) {
-                        if (msg.type === 'deregistered') {
-                            clientName = msg.data;
+                        if (msg.type === 'devLeaving') {
+                            clientName = msg.cnode;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (clientName === 'cnode02' && !shepherd.find('cnode02')) {
                                 shepherd.removeListener('ind', deCallback);
@@ -400,8 +399,8 @@ describe('coap-shepherd', function () {
                 var rsp = {},
                     cnode,
                     outCallback = function (msg) {
-                        if (msg.type === 'sleep') {
-                            clientName = msg.data;
+                        if (msg.type === 'devStatus' || msg.data === 'sleep') {
+                            clientName = msg.cnode.clientName;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (clientName === 'cnode01') {
                                 expect(shepherd.find('cnode01').status).to.be.eql('sleep');
@@ -440,8 +439,8 @@ describe('coap-shepherd', function () {
                 var rsp = {},
                     cnode,
                     outCallback = function (msg) {
-                        if (msg.type === 'offline') {
-                            clientName = msg.data;
+                        if (msg.type === 'devStatus' || msg.data === 'offline') {
+                            clientName = msg.cnode.clientName;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (clientName === 'cnode01') {
                                 expect(shepherd.find('cnode01').status).to.be.eql('offline');
@@ -480,8 +479,8 @@ describe('coap-shepherd', function () {
                     rsp = {},
                     cnode,
                     inCallback = function (msg) {
-                        if (msg.type === 'online') {
-                            clientName = msg.data;
+                        if (msg.type === 'devStatus' || msg.data === 'online') {
+                            clientName = msg.cnode.clientName;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (clientName === 'cnode01') {
                                 observeReqStub.restore();

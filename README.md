@@ -117,7 +117,7 @@ CoapNode is the class to create software endpoints of the remote Client Devices 
 * [cnode.executeReq()](#API_executeReq)
 * [cnode.observeReq()](#API_observeReq)
 * [cnode.cancelObserveReq()](#API_cancelObserveReq)
-* [cnode.ping()](#API_ping)
+* [cnode.pingReq()](#API_pingReq)
 * [cnode.dump()](#API_dump)
 
 *************************************************
@@ -311,67 +311,96 @@ Fired when there is an error occurs.
 <a name="EVT_ind"></a>
 ### Event: 'ind'
 `function (msg) { }`  
-Fired when there is an incoming indication message. There are 6 types of indication including `'registered'`, `'deregistered'`, `'online'`, `'offline'`, `'notify'`, and `'update'`.  
+Fired when there is an incoming indication message. There are 5 types of indication including `'devIncoming'`, `'devLeaving'`, `'devUpdate'`, `'devStatus'`, and `'devNotify'`.  
 
-* **registered**  
+* **devIncoming**  
      Fired when a Client Device registers to cserver.  
 
-    * msg.type: `'registered'`
-    * msg.data (_Object_): a cnode of which Client Device has successfully registered to cserver.  
+    * msg.type: `'devIncoming'`
+    * msg.cnode: `cnode`, the cnode instance of which cnode is incoming
+    * msg.data: `undefined`  
+    * message examples
+        ```js
+        {
+            type: 'devIncoming',
+            cnode: cnode instance
+        }
+        ```
 
-* **deregistered**  
+* **devLeaving**  
      Fired when a Client Device deregisters from cserver.  
 
-    * msg.type: `'deregistered'`
-    * msg.data (_String_): clientName of which Client Device has successfully deregistered from cserver.  
-
-* **online**  
-     Fired when a Client Device goes online.
-
-    * msg.type: `'online'`
-    * msg.data (_String_): clientName of which Client Device goes online.  
-
-* **offline**  
-     Fired when a Client Device goes offline.
-
-    * msg.type: `'offline'`
-    * msg.data (_String_): clientName of which Client Device goes offline.  
-
-* **notify**  
-     Fired upon receiving an notification of Object Instance or Resource from a Client Device.  
-
-    * msg.type: `'notify'`
-    * msg.data (_Object_): notification from a Client Device. This object has fields of `device`, `path`, and `value`.  
-
+    * msg.type: `'devLeaving'`
+    * msg.cnode: `'foo_name'`, the clientName of which cnode is leaving
+    * msg.data: `30:1a:9f:5d:af:c8`, the mac address of which cnode is leaving.  
+    * message examples
         ```js
-        // example of a Resource notification
         {
-            device: 'foo_name',
-            path: '/temperature/0/sensorValue',
-            value: 21
+            type: 'devLeaving',
+            cnode: 'foo_name',
+            data: '30:1a:9f:5d:af:c8'
         }
+        ```
+* **devUpdate**  
+     Fired when a Client Device updates its device attributes.
 
-        // example of an Object Instance notification
+    * msg.type: `'update'`
+    * msg.cnode: `cnode`
+    * msg.data: this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
+    * message examples
+        ```js
         {
-            device: 'foo_name',
-            path: '/temperature/0',
-            value: {
-                sensorValue: 21
+            type: 'devUpdate',
+            cnode: cnode instance,
+            data: {
+                lifetime: 42000
             }
         }
         ```
 
-* **update**  
-     Fired when a Client Device updates its device attributes.
+* **devStatus**  
+     Fired when there is a cnode going online, going offline, or going to sleep.
 
-    * msg.type: `'update'`
-    * msg.data (_Object_): this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
-
+    * msg.type: `'devStatus'`
+    * msg.cnode: `cnode`
+    * msg.data: `'online'`, `'offline'`, or `'sleep'`
+    * message examples
         ```js
-        // example
         {
-            device: 'foo_name',
-            lifetime: 12000
+            type: 'devStatus',
+            cnode: cnode instance,
+            data: 'offline'
+        }
+        ```
+
+* **devNotify**  
+     Fired upon receiving an notification of Object Instance or Resource from a Client Device.  
+
+    * msg.type: `'devNotify'`
+    * msg.cnode: `cnode`
+    * msg.data: notification from a Client Device. This object has fields of `device`, `path`, and `value`.  
+    * message examples
+        ```js
+        // A Resource notification
+        {
+            type: 'devNotify',
+            cnode: cnode instance,
+            data: {
+                path: '/temperature/0/sensorValue',
+                value: 21
+            }
+        }
+
+        // An Object Instance notification
+        {
+            type: 'devNotify',
+            cnode: cnode instance,
+            data: {
+                path: '/temperature/0',
+                value: {
+                    sensorValue: 21
+                }  
+            }
         }
         ```
 
@@ -742,8 +771,8 @@ cnode.cancelObserveReq('/temperature/0/foo', function (err, rsp) {
 });
 ```
 *************************************************
-<a name="API_ping"></a>
-### cnode.ping([callback])
+<a name="API_pingReq"></a>
+### cnode.pingReq([callback])
 Ping the Client Device.  
 
 **Arguments:**  
@@ -766,7 +795,7 @@ Ping the Client Device.
 **Examples:** 
 
 ```js
-cnode.ping(function (err, rsp) {
+cnode.pingReq(function (err, rsp) {
     console.log(rsp);   // { status: '2.05', data: 10 }
 });
 ```
