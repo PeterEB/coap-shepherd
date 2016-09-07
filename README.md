@@ -99,12 +99,13 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 
 * [cserver.start()](#API_start)
 * [cserver.stop()](#API_stop)
+* [cserver.reset()](#API_reset)
 * [cserver.permitJoin()](#API_permitJoin)
 * [cserver.list()](#API_list)
 * [cserver.find()](#API_find)
 * [cserver.remove()](#API_remove)
 * [cserver.announce()](#API_announce)
-* Events: [ready](#EVT_ready), [ind](#EVT_ind), and [error](#EVT_error)
+* Events: [ready](#EVT_ready), [error](#EVT_error), [permitJoining](#EVT_permitJoining), and [ind](#EVT_ind)
 
 #### 2. CoapNode APIs
 
@@ -162,6 +163,28 @@ Stop the cserver.
 ```js
 cserver.stop(function (err) {
     console.log('server stopped.');
+});
+```
+
+*************************************************
+<a name="API_reset"></a>
+### cserver.reset([callback])
+Reset the cserver.
+
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err) { }`. Get called after the server restarted.  
+
+**Returns:**  
+
+* (none)
+
+**Examples:** 
+
+```js
+cserver.reset(function (err) {
+    if (!err) 
+        console.log('server restarted.');
 });
 ```
 
@@ -308,6 +331,12 @@ Fired when cserver is ready.
 Fired when there is an error occurs.
 
 *************************************************
+<a name="EVT_permitJoining"></a>
+### Event: 'permitJoining'
+`function (joinTimeLeft) { }`  
+Fired when cserver is allowing for devices to join the network, where `joinTimeLeft` is number of seconds left to allow devices to join the network. This event will be triggered at each tick of countdown.
+
+*************************************************
 <a name="EVT_ind"></a>
 ### Event: 'ind'
 `function (msg) { }`  
@@ -319,7 +348,8 @@ Fired when there is an incoming indication message. There are 5 types of indicat
     * msg.type: `'devIncoming'`
     * msg.cnode: `cnode`, the cnode instance of which cnode is incoming
     * msg.data: `undefined`  
-    * message examples
+    * message examples  
+
         ```js
         {
             type: 'devIncoming',
@@ -333,7 +363,8 @@ Fired when there is an incoming indication message. There are 5 types of indicat
     * msg.type: `'devLeaving'`
     * msg.cnode: `'foo_name'`, the clientName of which cnode is leaving
     * msg.data: `30:1a:9f:5d:af:c8`, the mac address of which cnode is leaving.  
-    * message examples
+    * message examples  
+
         ```js
         {
             type: 'devLeaving',
@@ -347,7 +378,8 @@ Fired when there is an incoming indication message. There are 5 types of indicat
     * msg.type: `'update'`
     * msg.cnode: `cnode`
     * msg.data: this object at least has a `device` field to denote the name of a Client Device, and it may have fields of `lifetime`, `objList`, `ip`, and `port`.  
-    * message examples
+    * message examples  
+
         ```js
         {
             type: 'devUpdate',
@@ -364,7 +396,8 @@ Fired when there is an incoming indication message. There are 5 types of indicat
     * msg.type: `'devStatus'`
     * msg.cnode: `cnode`
     * msg.data: `'online'`, `'offline'`, or `'sleep'`
-    * message examples
+    * message examples  
+
         ```js
         {
             type: 'devStatus',
@@ -379,7 +412,8 @@ Fired when there is an incoming indication message. There are 5 types of indicat
     * msg.type: `'devNotify'`
     * msg.cnode: `cnode`
     * msg.data: notification from a Client Device. This object has fields of `device`, `path`, and `value`.  
-    * message examples
+    * message examples  
+
         ```js
         // A Resource notification
         {
@@ -404,9 +438,7 @@ Fired when there is an incoming indication message. There are 5 types of indicat
         }
         ```
 
-***********************************************
-
-<br /> 
+*************************************************
 
 ## CoapNode Class
 
@@ -701,7 +733,6 @@ Start observing an Object Instance or a Resource on the Client Device. **coap-sh
 
         | rsp.status   | Status      | Description                                  |
         |--------------|-------------|----------------------------------------------|
-        | '2.00'       | Ok          | The target has been observed.                |
         | '2.05'       | Content     | Observe operation is completed successfully. |
         | '4.04'       | Not Found   | The target is not found on the Client.       |
         | '4.05'       | Not Allowed | Target is not allowed for Observe operation. |
@@ -728,11 +759,6 @@ cnode.observeReq('/temperature/0/foo', function (err, rsp) {
 // target is not allowed for observation
 cnode.observeReq('/temperature/0/bar', function (err, rsp) {
     console.log(rsp);   // { status: '4.05' }
-});
-
-// target has been observed
-cnode.observeReq('/temperature/0/sensedValue', function (err, rsp) {
-    console.log(rsp);   // { status: '2.00' }
 });
 ```
 *************************************************

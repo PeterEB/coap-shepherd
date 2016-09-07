@@ -220,10 +220,10 @@ describe('cutils', function () {
         });
 
         it('#.getSoKeyObj()', function () {
-            expect(cutils.getSoKeyObj('/1/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/lwm2mServer/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/1/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: 2, rid: 'defaultMaxPeriod' });
+            expect(cutils.getSoKeyObj('/1/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getSoKeyObj('/lwm2mServer/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getSoKeyObj('/1/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getSoKeyObj('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
         });
 
         it('#.getSoValPath()', function () {        
