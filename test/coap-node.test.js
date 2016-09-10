@@ -147,6 +147,10 @@ describe('coap-node', function () {
 
         // Asynchronous APIs
         describe('#.readReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.readReq([]); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.readReq('x').fail(function (err) {
@@ -156,57 +160,45 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.readReq('x').fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.readReq([]).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.writeReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.writeReq([], 1); }).to.throw();
+            });
+
+            it('should throw err if path is object', function () {
+                expect(function () { return  node.writeReq('x', 1); }).to.throw();
+            });
+
+            it('should throw err if value is undefined', function () {
+                expect(function () { return  node.writeReq('x/y/z', undefined); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
-                node.writeReq('x/y', 1).fail(function (err) {
+                node.writeReq('x/y', {}).fail(function (err) {
                     done();
                 });
             });
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
-                node.writeReq('x/y', 1).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.writeReq([], 1).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if value is undefined', function (done) {
-                node.writeReq('x/y/z', undefined).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is object', function (done) {
-                node.writeReq('x', 10).fail(function (err) {
+                node.writeReq('x/y', {}).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.executeReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.executeReq([], []); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.executeReq('x/y/z', []).fail(function (err) {
@@ -216,27 +208,23 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.executeReq('x/y/z', []).fail(function (err) {
                     done();
                 });
             });
 
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.executeReq([], []).fail(function (err) {
-                    done();
-                });
-            });
-
             it('should return err if args is not an array', function (done) {
-                node.executeReq([], 10).fail(function (err) {
+                node.executeReq('x/y/z', 10).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.discoverReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.discoverReq([], []); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.discoverReq('x/y').fail(function (err) {
@@ -246,21 +234,21 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.discoverReq('x/y').fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.discoverReq([]).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.writeAttrReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.writeAttrsReq([], {}); }).to.throw();
+            });
+
+            it('should throw err if attrs is not an object', function () {
+                expect(function () { return  node.writeAttrsReq('x/y', 10); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.writeAttrsReq('x/y', {}).fail(function (err) {
@@ -270,27 +258,17 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.writeAttrsReq('x/y', {}).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.writeAttrsReq([], {}).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if attrs is not an object', function (done) {
-                node.writeAttrsReq('x/y', 10).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.observeReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.observeReq([], {}); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.observeReq('x/y/z').fail(function (err) {
@@ -300,21 +278,17 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.observeReq('x/y/z').fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.observeReq([]).fail(function (err) {
                     done();
                 });
             });
         });
 
         describe('#.cancelObserveReq()', function () {
+            it('should throw err if path is not a string', function () {
+                expect(function () { return  node.cancelObserveReq([], {}); }).to.throw();
+            });
+
             it('should return err if not registered', function (done) {
                 node._registered = false;
                 node.cancelObserveReq('x/y/z').fail(function (err) {
@@ -324,15 +298,7 @@ describe('coap-node', function () {
 
             it('should return err if status is offline', function (done) {
                 node._registered = true;
-                node._setStatus('offline');
                 node.cancelObserveReq('x/y/z').fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if path is not a string', function (done) {
-                node._setStatus('online');
-                node.cancelObserveReq([]).fail(function (err) {
                     done();
                 });
             });
