@@ -724,6 +724,11 @@ cnode.executeReq('/temperature/0/bar', function (err, rsp) {
 ### cnode.observeReq(path[, callback])
 Start observing an Object Instance or a Resource on the Client Device. **coap-shepherd** don't support the observation on an Object at this moment.  
 
+**Note**
+
+* Server always re-initiate observation requests for the previous observations whenever client registers. 
+* When a client deregisters, server will assume past states are nullified including the previous observations.
+
 **Arguments:**  
 
 1. `path` (_String_): path of the allocated Object Instance or Resource on the remote Client Device.

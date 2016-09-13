@@ -69,6 +69,7 @@ describe('coap-node', function () {
             expect(node.lifetime).to.be.eql(86400);
             expect(node.status).to.be.eql('offline');
             expect(node.objList).to.be.eql({ x: [0, 1] });
+            expect(node.observedList).to.be.eql([]);
             expect(node._registered).to.be.false;
             expect(node._streamObservers).to.be.eql({});
             expect(node._lifeChecker).to.be.eql(null);
@@ -823,6 +824,7 @@ describe('coap-node', function () {
                     lifetime: 86400,
                     version: '1.0.0',
                     objList: { x: [0, 1] },
+                    observedList: [],
                     so: {
                         x: sObj
                     }
@@ -858,6 +860,7 @@ describe('coap-node', function () {
                     lifetime: 86400,
                     version: '1.0.0',
                     objList: { x: [0, 1] },
+                    observedList: [],
                     so: {
                         x: sObj
                     }
@@ -883,6 +886,7 @@ describe('coap-node', function () {
                     lifetime: 86400,
                     version: '1.0.0',
                     objList: { x: [0, 1] },
+                    observedList: [],
                     so: {
                         x: sObj
                     }
