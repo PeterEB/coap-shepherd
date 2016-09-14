@@ -100,6 +100,7 @@ describe('coap-shepherd', function () {
 
         describe('#.permitJoin()', function () {
             it('should throw TypeError if time is not a number', function () {
+                expect(function () { return shepherd.permitJoin(null); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin('xx'); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin([]); }).to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin({}); }).to.throw(TypeError);
@@ -109,7 +110,6 @@ describe('coap-shepherd', function () {
 
                 expect(function () { return shepherd.permitJoin(); }).not.to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin(undefined); }).not.to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(null); }).not.to.throw(TypeError);
                 expect(function () { return shepherd.permitJoin(10); }).not.to.throw(TypeError);
             });
         });
@@ -124,7 +124,6 @@ describe('coap-shepherd', function () {
                 expect(function () { return shepherd.request('xx'); }).to.throw(TypeError);
                 expect(function () { return shepherd.request([]); }).to.throw(TypeError);
                 expect(function () { return shepherd.request(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(new Date()); }).to.throw(TypeError);
                 expect(function () { return shepherd.request(function () {}); }).to.throw(TypeError);
 
                 expect(function () { return shepherd.request({}); }).not.to.throw(TypeError);
@@ -167,6 +166,7 @@ describe('coap-shepherd', function () {
 
         describe('#._newClientId()', function () {
             it('should throw TypeError if id is not a number', function () {
+                expect(function () { return shepherd._newClientId(null); }).to.throw(TypeError);
                 expect(function () { return shepherd._newClientId(NaN); }).to.throw(TypeError);
                 expect(function () { return shepherd._newClientId('xx'); }).to.throw(TypeError);
                 expect(function () { return shepherd._newClientId({}); }).to.throw(TypeError);
@@ -177,7 +177,6 @@ describe('coap-shepherd', function () {
 
                 expect(function () { return shepherd._newClientId(); }).not.to.throw(TypeError);
                 expect(function () { return shepherd._newClientId(undefined); }).not.to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(null); }).not.to.throw(TypeError);
                 expect(function () { return shepherd._newClientId(10); }).not.to.throw(TypeError);
             });
         });
