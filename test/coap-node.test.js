@@ -492,7 +492,7 @@ describe('coap-node', function () {
                     method: 'PUT',
                     payload: 10,
                     options: {
-                        'Content-Format': 'text/plain'
+                        'Content-Format': 'application/json'
                     }
                 };
                 rspObj = {

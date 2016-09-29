@@ -1,0 +1,7 @@
+{"$$indexCreated":{"fieldName":"clientName","unique":true,"sparse":false}}
+{"clientName":"cnode01","clientId":1,"lifetime":86400,"version":"1.0.0","ip":"127.0.0.1","mac":"AA:AA:AA","port":"5686","joinTime":1475123201124,"objList":{"x":["0","1"],"y":["0","1"]},"so":{},"observedList":[],"_id":"yQS88OpjqbxGITqm"}
+{"clientName":"cnode02","clientId":2,"lifetime":86400,"version":"1.0.0","ip":"127.0.0.1","mac":"BB:BB:BB","port":"5687","joinTime":1475123201214,"objList":{"a":["0","1"],"b":["0","1"]},"so":{},"observedList":[],"_id":"KMTD45ENQ27MXhzE"}
+{"clientName":"cnode01","clientId":1,"lifetime":87654,"version":"1.0.0","ip":"127.0.0.1","mac":"AA:AA:AA","port":"5688","joinTime":1475123201124,"objList":{"x":["0","1"],"y":["0","1"]},"so":{},"observedList":[],"_id":"yQS88OpjqbxGITqm"}
+{"$$deleted":true,"_id":"KMTD45ENQ27MXhzE"}
+{"clientName":"cnode01","clientId":1,"lifetime":87654,"version":"1.0.0","ip":"127.0.0.1","mac":"AA:AA:AA","port":"5690","joinTime":1475123201124,"objList":{"x":["0","1"],"y":["0","1"]},"so":{},"observedList":[],"_id":"yQS88OpjqbxGITqm"}
+{"$$deleted":true,"_id":"yQS88OpjqbxGITqm"}
