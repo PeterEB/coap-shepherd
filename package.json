@@ -1,6 +1,6 @@
 {
   "name": "coap-shepherd",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "An implementation of CoAP network and devices management.",
   "main": "index.js",
   "dependencies": {
