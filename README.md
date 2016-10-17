@@ -20,9 +20,7 @@ coap-shepherd
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
 The goal of **coap-shepherd** is to provide a simple way to build and manage a **LWM2M** machine network.  
-
 ![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.png)  
-
 * It is a server-side application framework running on node.js with many network management functions.  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.  
 * Supports functionalities, such as permission of device joining, reading resources, writing resources, observing resources, and executing a procedure on a remote device.  
