@@ -19,9 +19,12 @@ coap-shepherd
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-The goal of **coap-shepherd** is to provide a simple way to build and manage a **CoAP** machine network.  
-* It is a server-side application framework running on node.js with many network management functions  
-* It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management  
+The goal of **coap-shepherd** is to provide a simple way to build and manage a **LWM2M** machine network.  
+
+![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.gif)  
+
+* It is a server-side application framework running on node.js with many network management functions.  
+* It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.  
 * Supports functionalities, such as permission of device joining, reading resources, writing resources, observing resources, and executing a procedure on a remote device.  
 * It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
 
@@ -105,7 +108,10 @@ In this document, **cserver** denotes an instance of CoapShepherd class. **cserv
 * [cserver.find()](#API_find)
 * [cserver.remove()](#API_remove)
 * [cserver.announce()](#API_announce)
-* Events: [ready](#EVT_ready), [error](#EVT_error), [permitJoining](#EVT_permitJoining), and [ind](#EVT_ind)
+* Events
+    * [ready](#EVT_ready), [permitJoining](#EVT_permitJoining)
+    * [ind](#EVT_ind)
+    * [error](#EVT_error)
 
 #### 2. CoapNode APIs
 

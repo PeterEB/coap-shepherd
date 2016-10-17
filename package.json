@@ -12,7 +12,7 @@
     "network": "^0.2.1",
     "proving": "^0.1.0",
     "q": "^1.4.1",
-    "smartobject": "^1.0.0"
+    "smartobject": "^1.2.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
