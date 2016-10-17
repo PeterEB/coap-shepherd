@@ -21,7 +21,7 @@ coap-shepherd
 
 The goal of **coap-shepherd** is to provide a simple way to build and manage a **LWM2M** machine network.  
 
-![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.gif)  
+![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.png)  
 
 * It is a server-side application framework running on node.js with many network management functions.  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.  
