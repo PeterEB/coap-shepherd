@@ -18,10 +18,12 @@ coap-shepherd
 ## 1. Overview
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
+ 
+**coap-shepherd** and **coap-node** modules aim to provide a simple way to build and manage a **LWM2M** network.
+![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/lwm2m_net.png)  
+### LWM2M Server: coap-shepherd
 
-The goal of **coap-shepherd** is to provide a simple way to build and manage a **LWM2M** machine network.  
-![coap-shepherd net](https://github.com/PeterEB/coap-shepherd/blob/master/doc/coap_net.png)  
-* It is a server-side application framework running on node.js with many network management functions.  
+* It is a **LWM2M** Server application framework running on node.js.  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.  
 * Supports functionalities, such as permission of device joining, reading resources, writing resources, observing resources, and executing a procedure on a remote device.  
 * It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. Here is an example, all these requests is to read a value from the same resource but with different addressing style.  
@@ -61,10 +63,10 @@ cnode.readReq('/temperature/0/5700', function (err, rsp) {
 <a name="Features"></a>
 ## 2. Features
 
-* CoAP protocol  
+* Constrained Application Protocol (CoAP)  
 * Based on [node-coap](https://github.com/mcollina/node-coap), a node.js CoAP client/server library  
-* Hierarchical data model in Smart-Object-style (IPSO)  
 * CoAP network and devices management  
+* Hierarchical data model in Smart-Object-style (IPSO)  
 * Client/server interaction through LWM2M-defined interfaces  
 
 <a name="Installation"></a>
