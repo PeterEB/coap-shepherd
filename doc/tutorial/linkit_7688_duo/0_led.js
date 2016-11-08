@@ -24,7 +24,7 @@ so.init('lightCtrl', 0, {
                 ledPin = this.parent.hal.ledPin,
                 ledState = val ? board.HIGH : board.LOW;
 
-    		board.digitalWrite(ledPin, ledState);
+            board.digitalWrite(ledPin, ledState);
 
             process.nextTick(function () {
                 cb(null, board.pins[ledPin].value);

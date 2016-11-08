@@ -1,16 +1,43 @@
 Tutorial
 ===========
 
-This tutorial will show you how to build a LWM2M network with `coap-shepherd`, `coap-node` and `smartobject`.
+This tutorial will show you how to build a LWM2M network with [`coap-shepherd`](https://github.com/PeterEB/coap-shepherd), [`coap-node` ](https://github.com/PeterEB/coap-node)and [`smartobject`](https://github.com/PeterEB/smartobject).
+	
+#### Prepare your hardware
 
-Before you start, you need to prepare some hardware:
+* Server-side machine: PC, [Raspberry Pi](https://www.raspberrypi.org/), or other Node.js platform  
+* Client-side machine: [Linkit Smart 7688 Duo](https://labs.mediatek.com/site/global/developer_tools/mediatek_linkit_smart_7688/training_docs/linkit_smart_7688_duo/index.gsp)  
+* LED
+* Push button
 
-1. PC, Raspberry Pi, or other Node.js platform  
-2. Linkit Smart 7688 Duo  
-3. LED
-4. Push button
+<a name="SectionA"></a>
+## Section A: Using Firmata with Node.js
 
-## Section A: Build Your SmartObject
+This section illustrates the MPU and MCU communication using Firmata protocol in MediaTek [Linkit 7688 Duo](https://labs.mediatek.com/site/global/developer_tools/mediatek_linkit_smart_7688/training_docs/linkit_smart_7688_duo/firmata_nodejs/index.gsp) with Node.js.
+
+## Setup MCU
+
+### 1. Install Arduino IDE
+
+Set up the MCU by launching [Arduino IDE 1.6.5](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous) on your computer
+
+### 2. Install Linkit Smart 7688 Duo in Board Manager 
+
+In Arduino IDE, on the File menu click Preferences then insert http://download.labs.mediatek.com/package_mtk_linkit_smart_7688_test_index.json to the Additional Boards Manager URLs.
+
+### 3. Copy the Firmata sketch to Arduino
+
+Copy the sketch code to the Arduino IDE. The sketch used in this example is from: https://gist.github.com/edgarsilva/e73c15a019396d6aaef2
+
+### 4. Upload to Linkit 7688 Duo with network port
+
+Tool --> Port --> Network port
+
+Click Upload!
+
+## Setup MPU
+
+While you can install Firmata using NPM on LinkIt 7688 Duo, the process is a bit long. So you’ll need to install Firmata on your computer and then use SCP to transfer the compressed file to the Linkit 7688 Duo.
 
 ### 1. Create a folder /testfirmata and install `firmata` in it
 
@@ -23,6 +50,8 @@ npm install firmata@0.10.1
 ```
 
 ### 2. Remove node-serialport modules in /firmata/node_modules
+
+We need to remove it because serialport is already available on LinkIt Smart 7688 system image.
 
 ```sh
 rm -rf node_modules/firmata/node_modules/serialport/
@@ -40,7 +69,7 @@ tar -cvf firmata.tar node_modules/firmata
 scp firmata.tar root@mylinkit.local:/root   # replace the host name or ip with yours Linkit 7688 Duo
 ```
 
-### 5. ssh into the board
+### 5. ssh into the board (Linkit 7688 Duo)
 
 ```sh
 ssh root@mylinkit.local   # replace the host name or ip with yours Linkit 7688 Duo
@@ -56,7 +85,14 @@ mkdir app
 tar -xvf firmata.tar -C app/
 ```
 
-### 7. Create smartobj.js in /app folder
+<br />
+
+<a name="SectionB"></a>
+## Section B: Build Your SmartObject
+
+Let's abstract a led and a push button into a smart object with Firmata.
+
+### 1. Create smartobj.js in /app folder on Linkit 7688 Duo
 
 ```sh
 cd app 
@@ -66,13 +102,13 @@ cd app
 touch smartobj.js
 ```
 
-### 8 install the `smartobject` module in /app folder
+### 2 install the `smartobject` module in /app folder
 
 ```sh
 npm install smartobject
 ```
 
-### 9. Edit smartobj.js, we will use `firmata` as the hal controller
+### 3. Edit smartobj.js, we will use `firmata` as the hal controller
 
 * [[1] SmartObject Constructor](https://github.com/PeterEB/smartobject#API_smartobject)
 * [[2] Light Control Object Instance code template](https://github.com/PeterEB/smartobject/blob/master/docs/templates.md#tmpl_lightCtrl)
@@ -148,13 +184,13 @@ board.on("ready", function() {
 });
 ```
 
-### 10. Test the led
+### 4. Test the led
 
 ```sh
 node smartobj.js
 ```
 
-### 11. Make a led blink driver
+### 5. Make a led blink driver
 
 ```js
 var Board = require('firmata'),
@@ -204,13 +240,15 @@ board.on("ready", function() {
 });
 ```
 
-### 12. Test the led blink driver
+### 6. Test the led blink driver
 
 ```sh
 node smartobj.js
 ```
 
-### 13. The push button
+### 7. The push button
+
+* [[1] Push Button Smart Object](https://github.com/PeterEB/smartobject/blob/master/docs/templates.md#tmpl_button)
 
 ```js
 var Board = require('firmata'),
@@ -248,8 +286,7 @@ so.init('lightCtrl', 0, {
     // ... code remains the same
 });
 
-// Push Button Smart Object:
-// https://github.com/PeterEB/smartobject/blob/master/docs/templates.md#tmpl_button
+// see [1]
 so.init('pushButton', 0, {
     dInState: {
         read: function (cb) {
@@ -280,30 +317,30 @@ board.on("ready", function() {
 
 ```
 
-### 14. Test the push button and watch the led
+### 8. Test the push button and watch the led
 
 ```sh
 node smartobj.js
 ```
 
-## Section B: Network Protocol Come In
+<br />
+
+<a name="SectionC"></a>
+## Section C: Network Protocol Come In
+
 In this section, we will use lightweight M2M (LWM2M) to build the IoT network. At server side, we'll use `coap-shepherd` to create the LWM2M server, and use `coap-node` on our Linkit 7688 Duo machine to create the LWM2M client. You can build a MQTT network with `mqtt-shepherd` and `mqtt-node` as well, they follow the similar pattern with smartobject module.
 
-## Client-side (On our Linkit 7688 Duo machine)
+## Client-side (On Linkit 7688 Duo)
 
-### 1. Our so is a module that abstract all the hardware and drivers
+### 1. Our `so` is a module that abstract all the hardware and drivers
 
-* [[1] coap-node basic usage](https://github.com/PeterEB/coap-node#Usage)
+In step 7@section B, we've build a nice smart object in smartobj.js, let's add the following line to the end of the file:
 
 ```js
 var Board = require('firmata'),
     SmartObject = require('smartobject');
 
 // ... code remains the same
-
-// take off this line for our demo can go nicely
-// (since we'll let the led blink when machine booted up, but the led is also controlled by the button. That conflicts.)
-// so.hal.pollButton();
 
 // export our so
 module.exports = so;
@@ -317,10 +354,13 @@ npm install coap-node
 
 ### 3. Create a file client.js in /app folder and write some code
 
+* [[1] coap-node basic usage](https://github.com/PeterEB/coap-node#Usage)
+
 ```js
 var so = require('./smartobj.js'),
     CoapNode = require('coap-node');
 
+// see [1]
 var coapNode = new CoapNode('my_cnode', so);
 
 coapNode.on('registered', function () {
@@ -333,13 +373,15 @@ so.hal.board.on('ready', function () {
 
     // Register to the server after Arduino ready to communicate
     console.log('>> Register to a server...');
-    coapNode.register('192.168.1.115', 5683, function (err, msg) {
+
+    // replace the ip with yours server-side machine 
+    coapNode.register('192.168.1.115', 5683, function (err, msg) {    
         console.log(msg);
     });
 });
 ```
 
-## Server-side (On our PC, RaspberryPi, or BeagleBone)
+## Server-side (On PC or Raspberry Pi)
 
 ### 1. Create a folder /cserver and a server.js in it
 
@@ -423,9 +465,12 @@ cserver.on('ind', function (msg) {
 });
 ```
 
-## Section C: Start LWM2M Machine Network
+<br />
 
-### At server-side (on PC)
+<a name="SectionD"></a>
+## Section D: Start LWM2M Network
+
+### At server-side (on PC or Raspberry Pi)
 
 ```sh
 node server
