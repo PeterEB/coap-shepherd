@@ -490,7 +490,7 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0/x0',
                     method: 'PUT',
-                    payload: 10,
+                    payload: { bn: '/x/0/x0', e: [{ n: '', v: 10}]},
                     options: {
                         'Content-Format': 'application/json'
                     }
@@ -511,7 +511,7 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0',
                     method: 'PUT',
-                    payload: { 'e': [
+                    payload: { bn: '/x/0', 'e': [
                         { 'n': 'x0', 'v': 10 }, 
                         { 'n': 'x1', 'v': 20 } 
                     ]},

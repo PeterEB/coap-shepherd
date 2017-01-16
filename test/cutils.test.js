@@ -234,16 +234,16 @@ describe('cutils', function () {
         });
 
         it('#.encodeJsonObj()', function () {
-            expect(cutils.encodeJsonObj('x', { 1: {  0: 'x', 1: 5 }, 2: {  0: true }})).to.be.eql({ e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] });
-            expect(cutils.encodeJsonObj('x/y', { 0: 'x', 1: 5, 2: new Date(100000) })).to.be.eql({ e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }, { n: '2', v: 100000 }] });
-            expect(cutils.encodeJsonObj('x/y/z', 5)).to.be.eql(5);
-            expect(cutils.encodeJsonObj('x/y/z', new Date(100000))).to.be.eql(100000);
+            expect(cutils.encodeJsonObj('x', { 1: {  0: 'x', 1: 5 }, 2: {  0: true }})).to.be.eql({ bn: '/x', e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] });
+            expect(cutils.encodeJsonObj('x/y', { 0: 'x', 1: 5, 2: new Date(100000) })).to.be.eql({ bn: '/x/y', e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }, { n: '2', v: 100000 }] });
+            expect(cutils.encodeJsonObj('x/y/z', 5)).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 5}]});
+            expect(cutils.encodeJsonObj('x/y/z', new Date(100000))).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 100000}]});
         });
 
         it('#.decodeJsonObj()', function () {
             expect(cutils.decodeJsonObj('x', { e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] })).to.be.eql({ 1: {  0: 'x', 1: 5 }, 2: {  0: true }});
             expect(cutils.decodeJsonObj('x/y', { e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }] })).to.be.eql({  0: 'x', 1: 5 });
-            expect(cutils.decodeJsonObj('x/y/z', 5)).to.be.eql(5);
+            expect(cutils.decodeJsonObj('x/y/z', { e: [{ n: '', v: 5}]})).to.be.eql(5);
         });
 
         it('#.dotPath()', function () {

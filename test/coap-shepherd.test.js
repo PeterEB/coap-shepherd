@@ -251,7 +251,7 @@ describe('coap-shepherd', function () {
                             cnode = msg.cnode;
                             _readAllResourceStub.restore();
                             observeReqStub.restore();
-                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', cnode.locationPath);
+                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
                             expect(rsp.end).to.have.been.calledWith('');
                             if (shepherd.find('cnode01') === cnode) {
                                 shepherd.removeListener('ind', regCallback);
@@ -297,7 +297,7 @@ describe('coap-shepherd', function () {
                     regCallback = function (msg) {
                         if (msg.type === 'devIncoming') {
                             cnode = msg.cnode;
-                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', cnode.locationPath);
+                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
                             expect(rsp.end).to.have.been.calledWith('');
                             if (shepherd.find('cnode02') === cnode) {
                                 _readAllResourceStub.restore();
