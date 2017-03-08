@@ -22,7 +22,7 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-shepherd/wiki).
 **coap-shepherd** and **coap-node** modules aim to provide a simple way to build and manage a **LWM2M** network.
 * Server-side library: **coap-shepherd** (this module)
 * Client-side library: [**coap-node**](https://github.com/PeterEB/coap-node)
-* [**A simple demo webapp**](https://github.com/lwmqn/lwmqn-demo)
+* [**A simple demo webapp**](https://github.com/PeterEB/quick-demo)
 
 ![coap-shepherd net](https://raw.githubusercontent.com/PeterEB/documents/master/coap-shepherd/media/lwm2m_net.png) 
 
