@@ -1,4 +1,4 @@
-var shepherd = require('./index.js');
+var shepherd = require('../index.js');
 // var Discovery = require('udp-discovery').Discovery;
 // var discover = new Discovery();
 
