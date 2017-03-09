@@ -29,6 +29,7 @@ describe('coap-shepherd', function () {
             expect(shepherd._hbChecker).to.be.eql(null);
         });
     });
+    
     describe('Signature Check', function () {
         describe('#.find()', function () {
             it('should throw TypeError if clientName is not a string', function () {
@@ -221,7 +222,7 @@ describe('coap-shepherd', function () {
         describe('#.permitJoin()', function () {
             it('should open permitJoin', function () {
                 shepherd.permitJoin(180);
-                expect(shepherd._joinable).to.be.eql('on');
+                expect(shepherd._joinable).to.be.eql(true);
             });
         });
 

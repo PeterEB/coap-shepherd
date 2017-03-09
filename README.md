@@ -43,20 +43,25 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-shepherd/wiki).
 
 ## Usage
 
-This example shows how to start a server and allow devices to join the network within 300 seconds after the server is ready:
+This example shows how to start a server and allow devices to join the network within 180 seconds after the server is ready:
 
 ```js
 var cserver = require('coap-shepherd');
 
 cserver.on('ready', function () {
     console.log('Server is ready.');
-    cserver.permitJoin(300);    // allow devices to join the network within 300 secs
+
+    // when server is ready, allow devices to join the network within 180 secs
+    cserver.permitJoin(180);  
 });
 
 cserver.start(function (err) {  // start the server
     if (err)
         console.log(err);
 });
+
+// That's all to start a LWM2M server.
+// Now cserver is going to automatically tackle most of the network managing things.
 ```
 
 <br />
