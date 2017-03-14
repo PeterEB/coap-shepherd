@@ -165,23 +165,6 @@ describe('coap-shepherd', function () {
             });
         });
 
-        describe('#.setIncomingDevPredicate()', function () {
-            it('should throw TypeError if clientName is not a string', function () {
-                expect(function () { return shepherd.setIncomingDevPredicate(); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.setIncomingDevPredicate(new Date()); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.setIncomingDevPredicate(function () { return true; }); }).not.to.throw(TypeError);
-            });
-        });
-
         describe('#._newClientId()', function () {
             it('should throw TypeError if id is not a number', function () {
                 expect(function () { return shepherd._newClientId(null); }).to.throw(TypeError);
@@ -623,8 +606,8 @@ describe('coap-shepherd', function () {
             });
         });
 
-        describe('#.setIncomingDevPredicate()', function () {
-            it('should set incomingDevPredicate and get not allow rsp', function (done) {
+        describe('#.acceptDevIncoming()', function () {
+            it('should implement acceptDevIncoming and get not allow rsp', function (done) {
                 var rsp = {};
 
                 rsp.end = function (msg) {
@@ -635,12 +618,41 @@ describe('coap-shepherd', function () {
                     }
                 };
 
-                shepherd.setIncomingDevPredicate(function (devInfo) {
-                    if (devInfo.clientName === 'cnode03')
-                        return false;
+                shepherd.acceptDevIncoming = function (devInfo, callback) {
+                    if (devInfo.clientName === 'cnode03') {
+                        callback(null, false);
+                    } else {
+                        callback(null, true);
+                    }
+                };
 
-                    return true;
-                });
+                emitClintReqMessage(shepherd, {
+                    code: '0.01',
+                    method: 'POST',
+                    url: '/rd?ep=cnode03&lt=86400&lwm2m=1.0.0&mac=BB:BB:BB',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5687'
+                    },
+                    payload: '</a/0>,</a/1>,</b/0>,</b/1>',
+                    headers: {}
+                }, rsp);
+            });
+
+            it('should implement acceptDevIncoming and create dev', function (done) {
+                var rsp = {};
+
+                rsp.setOption = sinon.spy();
+                rsp.end = function (msg) {
+                    expect(rsp.code).to.be.eql('2.01');
+                    if (shepherd.find('cnode03')) {
+                        done();
+                    }
+                };
+
+                shepherd.acceptDevIncoming = function (devInfo, callback) {
+                    callback(null, true);
+                };
 
                 emitClintReqMessage(shepherd, {
                     code: '0.01',

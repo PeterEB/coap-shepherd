@@ -8,6 +8,12 @@ var Coapdb = require('../lib/components/coapdb.js');
 var dbPath = path.resolve('./test/database_test/coap.db'),
     coapdb;
 
+try {
+    fs.statSync('./test/database_test');
+} catch (e) {
+    fs.mkdirSync('./test/database_test');
+}
+
 var nodeMock1 = {
     clientName: 'mock01',
     locationPath: '1',
