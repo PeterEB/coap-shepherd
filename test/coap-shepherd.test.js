@@ -197,28 +197,6 @@ describe('coap-shepherd', function () {
             });
         });
 
-        describe('#.stop()', function () {
-            it('should stop shepherd', function (done) {
-                shepherd.stop().then(function () {
-                    if (shepherd._enabled === false && shepherd._server === null)
-                        done();
-                }).fail(function (err) {
-                    console.log(err);
-                });
-            });
-        });
-
-        describe('#.reset()', function () {
-            it('should reset shepherd', function (done) {
-                shepherd.reset().then(function () {
-                    if (shepherd._enabled === true)
-                        done();
-                }).fail(function (err) {
-                    console.log(err);
-                });
-            });
-        });
-
         describe('#.permitJoin()', function () {
             it('should open permitJoin', function () {
                 shepherd.permitJoin(180);
@@ -665,6 +643,40 @@ describe('coap-shepherd', function () {
                     payload: '</a/0>,</a/1>,</b/0>,</b/1>',
                     headers: {}
                 }, rsp);
+            });
+        });
+
+        describe('#.stop()', function () {
+            it('should stop shepherd', function (done) {
+                shepherd.stop().then(function () {
+                    if (shepherd._enabled === false && shepherd._server === null)
+                        done();
+                }).fail(function (err) {
+                    console.log(err);
+                });
+            });
+        });
+
+        describe('#.reset()', function () {
+            it('should reset shepherd', function (done) {
+                shepherd.reset().then(function () {
+                    if (shepherd._enabled === true)
+                        done();
+                }).fail(function (err) {
+                    console.log(err);
+                });
+            });
+
+            it('should remove db and reset shepherd', function (done) {
+                shepherd.reset(1).then(function () {
+                    if (shepherd._enabled === true) {
+                        console.log(shepherd._coapdb.exportClientNames());
+                        // expect(shepherd._coapdb.exportClientNames()).to.be.eql([]);
+                        done();
+                    }
+                }).fail(function (err) {
+                    console.log(err);
+                });
             });
         });
     });
