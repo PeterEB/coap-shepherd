@@ -553,6 +553,7 @@ describe('coap-node', function () {
         describe('#.discoverReq()', function () {
             it('should discover Resource and return status 2.05', function (done) {
                 var obj = {
+                    path: '/x/0/x0',
                     attrs: { 
                         pmin: 10, 
                         pmax: 60
@@ -584,13 +585,12 @@ describe('coap-node', function () {
 
             it('should discover Object Instance and return status 2.05', function (done) {
                 var obj = {
+                    path: '/x/0',
                     attrs: { 
                         pmin: 10, 
                         pmax: 60
                     },
-                    resrcList: {
-                        0: [ 'x0', 'x1' ]
-                    }
+                    resrcList: ['/x/0/x0', '/x/0/x1']
                 };
 
                 reqObj = {
@@ -618,14 +618,12 @@ describe('coap-node', function () {
 
             it('should discover Object and return status 2.05', function (done) {
                 var obj = {
+                    path: '/x',
                     attrs: { 
                         pmin: 10, 
                         pmax: 60
                     },
-                    resrcList: {
-                        0: [ 'x0', 'x1' ],
-                        1: [ 'x0', 'x1' ],
-                    }
+                    resrcList: [ '/x/0/x0', '/x/0/x1', '/x/1/x0', '/x/1/x1' ]
                 };
 
                 reqObj = {

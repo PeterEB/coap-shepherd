@@ -52,40 +52,40 @@ describe('cutils', function () {
             expect(function () { cutils.ridNumber(1, 5); }).not.to.throw();
         });
 
-        it('#.getAttrsAndRsc()', function () {
-            expect(function () { cutils.getAttrsAndRsc(5); }).to.throw();
-            expect(function () { cutils.getAttrsAndRsc({}); }).to.throw();
-            expect(function () { cutils.getAttrsAndRsc([]); }).to.throw();
-            expect(function () { cutils.getAttrsAndRsc(); }).to.throw();
+        it('#.getPathArray()', function () {
+            expect(function () { cutils.getPathArray(5); }).to.throw();
+            expect(function () { cutils.getPathArray({}); }).to.throw();
+            expect(function () { cutils.getPathArray([]); }).to.throw();
+            expect(function () { cutils.getPathArray(); }).to.throw();
 
-            expect(function () { cutils.getAttrsAndRsc('x'); }).not.to.throw();
+            expect(function () { cutils.getPathArray('x'); }).not.to.throw();
         });
 
-        it('#.pathSlashParser()', function () {
-            expect(function () { cutils.pathSlashParser(5); }).to.throw();
-            expect(function () { cutils.pathSlashParser({}); }).to.throw();
-            expect(function () { cutils.pathSlashParser([]); }).to.throw();
-            expect(function () { cutils.pathSlashParser(); }).to.throw();
+        it('#.getPathIdKey()', function () {
+            expect(function () { cutils.getPathIdKey(5); }).to.throw();
+            expect(function () { cutils.getPathIdKey({}); }).to.throw();
+            expect(function () { cutils.getPathIdKey([]); }).to.throw();
+            expect(function () { cutils.getPathIdKey(); }).to.throw();
 
-            expect(function () { cutils.pathSlashParser('x'); }).not.to.throw();
+            expect(function () { cutils.getPathIdKey('x'); }).not.to.throw();
         });
 
-        it('#.getSoKeyObj()', function () {
-            expect(function () { cutils.getSoKeyObj(5); }).to.throw();
-            expect(function () { cutils.getSoKeyObj({}); }).to.throw();
-            expect(function () { cutils.getSoKeyObj([]); }).to.throw();
-            expect(function () { cutils.getSoKeyObj(); }).to.throw();
+        it('#.getNumPath()', function () {        
+            expect(function () { cutils.getNumPath(5); }).to.throw();
+            expect(function () { cutils.getNumPath({}); }).to.throw();
+            expect(function () { cutils.getNumPath([]); }).to.throw();
+            expect(function () { cutils.getNumPath(); }).to.throw();
 
-            expect(function () { cutils.getSoKeyObj('x'); }).not.to.throw();
+            expect(function () { cutils.getNumPath('x'); }).not.to.throw();
         });
 
-        it('#.getSoValPath()', function () {        
-            expect(function () { cutils.getSoValPath(5); }).to.throw();
-            expect(function () { cutils.getSoValPath({}); }).to.throw();
-            expect(function () { cutils.getSoValPath([]); }).to.throw();
-            expect(function () { cutils.getSoValPath(); }).to.throw();
+        it('#.decodeLinkFormat()', function () {
+            expect(function () { cutils.decodeLinkFormat(5); }).to.throw();
+            expect(function () { cutils.decodeLinkFormat({}); }).to.throw();
+            expect(function () { cutils.decodeLinkFormat([]); }).to.throw();
+            expect(function () { cutils.decodeLinkFormat(); }).to.throw();
 
-            expect(function () { cutils.getSoValPath('x'); }).not.to.throw();
+            expect(function () { cutils.decodeLinkFormat('x'); }).not.to.throw();
         });
 
         it('#.encodeJsonObj()', function () {
@@ -117,9 +117,9 @@ describe('cutils', function () {
             expect(function () { cutils.decodeJsonObj([], 'x'); }).to.throw();
             expect(function () { cutils.decodeJsonObj(); }).to.throw();
 
-            expect(function () { cutils.decodeJsonObj('x/y/z', 'y'); }).not.to.throw();
-            expect(function () { cutils.decodeJsonObj('x/y/z', 5); }).not.to.throw();
-            expect(function () { cutils.decodeJsonObj('x', {}); }).not.to.throw();
+            expect(function () { cutils.decodeJsonObj('x/y/z', {e:[]}); }).not.to.throw();
+            expect(function () { cutils.decodeJsonObj('x/y/z', {e:[]}); }).not.to.throw();
+            expect(function () { cutils.decodeJsonObj('x', {e:[]}); }).not.to.throw();
         });
 
         it('#.dotPath()', function () {        
@@ -207,30 +207,30 @@ describe('cutils', function () {
             expect(cutils.ridNumber('1', 'disableTimeout')).to.be.eql(5);
         });
 
-        it('#.getAttrsAndRsc()', function () {
-            expect(cutils.getAttrsAndRsc('</1/2>;pmin=10;pmax=60,</1/2/1>,</1/2/2>')).to.be.eql({ attrs: { pmin: 10, pmax: 60 }, resrcList: { '2': ['lifetime', 'defaultMinPeriod'] } });
-            expect(cutils.getAttrsAndRsc('</1/2/1>;pmin=10;pmax=60;gt=1;lt=100;stp=1')).to.be.eql({ attrs: { pmin: 10, pmax: 60, gt: 1, lt: 100, stp: 1 }});
+        it('#.getPathArray()', function () {
+            expect(cutils.getPathArray('/x/y/z')).to.be.eql(['x', 'y', 'z']);
+            expect(cutils.getPathArray('/x/y/z/')).to.be.eql(['x', 'y', 'z']);
+            expect(cutils.getPathArray('x/y/z/')).to.be.eql(['x', 'y', 'z']);
+            expect(cutils.getPathArray('x/y/z')).to.be.eql(['x', 'y', 'z']);
         });
 
-        it('#.pathSlashParser()', function () {
-            expect(cutils.pathSlashParser('/x/y/z')).to.be.eql(['x', 'y', 'z']);
-            expect(cutils.pathSlashParser('/x/y/z/')).to.be.eql(['x', 'y', 'z']);
-            expect(cutils.pathSlashParser('x/y/z/')).to.be.eql(['x', 'y', 'z']);
-            expect(cutils.pathSlashParser('x/y/z')).to.be.eql(['x', 'y', 'z']);
+        it('#.getPathIdKey()', function () {
+            expect(cutils.getPathIdKey('/1/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getPathIdKey('/lwm2mServer/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getPathIdKey('/1/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+            expect(cutils.getPathIdKey('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
         });
 
-        it('#.getSoKeyObj()', function () {
-            expect(cutils.getSoKeyObj('/1/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/lwm2mServer/2/3')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/1/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
-            expect(cutils.getSoKeyObj('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql({ oid: 'lwm2mServer', iid: '2', rid: 'defaultMaxPeriod' });
+        it('#.getNumPath()', function () {        
+            expect(cutils.getNumPath('/1/2/3')).to.be.eql('/1/2/3');
+            expect(cutils.getNumPath('/lwm2mServer/2/3')).to.be.eql('/1/2/3');
+            expect(cutils.getNumPath('/1/2/defaultMaxPeriod')).to.be.eql('/1/2/3');
+            expect(cutils.getNumPath('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql('/1/2/3');
         });
 
-        it('#.getSoValPath()', function () {        
-            expect(cutils.getSoValPath('/1/2/3')).to.be.eql('/1/2/3');
-            expect(cutils.getSoValPath('/lwm2mServer/2/3')).to.be.eql('/1/2/3');
-            expect(cutils.getSoValPath('/1/2/defaultMaxPeriod')).to.be.eql('/1/2/3');
-            expect(cutils.getSoValPath('/lwm2mServer/2/defaultMaxPeriod')).to.be.eql('/1/2/3');
+        it('#.decodeLinkFormat()', function () {
+            expect(cutils.decodeLinkFormat('</1/2>;pmin=10;pmax=60,</1/2/1>,</1/2/2>')).to.be.eql({ path:'/1/2', attrs: { pmin: 10, pmax: 60 }, resrcList: ['/1/2/1', '/1/2/2'] });
+            expect(cutils.decodeLinkFormat('</1/2/1>;pmin=10;pmax=60;gt=1;lt=100;st=1')).to.be.eql({ path:'/1/2/1', attrs: { pmin: 10, pmax: 60, gt: 1, lt: 100, st: 1 }});
         });
 
         it('#.encodeJsonObj()', function () {
