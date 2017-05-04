@@ -20,7 +20,10 @@ var devAttrs = {
         port: '5685',
         mac: 'AA:BB:CC:DD:EE:00',
         version: '1.0.0',
-        objList: { x: [0, 1] }
+        objList: { x: [0, 1] },
+        opts: {
+            hb: true
+        }
     };
 
 var sObj = {

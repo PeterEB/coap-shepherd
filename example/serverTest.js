@@ -1,5 +1,4 @@
 var shepherd = require('../index.js');
-var cnode;
 
 shepherd.on('ready', function () {
     console.log('>> coap-shepherd server start!');
@@ -46,11 +45,16 @@ function errHandler (err) {
 }
 
 function handler (msg) {
+    var cnode;
+    console.log(msg.type);
     console.log(msg.data);
     
     if (msg.type === 'devIncoming') {
-        cnode = shepherd.find('nodeTest');
-        
+        cnode = msg.cnode;
+        console.log(cnode);
+
+        cnode.readReq('/3303/0', reqHandler);
+
 // // read test
 //         setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5701', reqHandler); }, 10000);
@@ -77,7 +81,7 @@ function handler (msg) {
 //         setTimeout(function () { cnode.writeReq('/3303/0', { 5700: 87, 5701: 'F' }, reqHandler); }, 28000);
 
 // // writeAttr test
-//        setTimeout(function () { cnode.writeAttrsReq('/3303/0/5700', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 3000);
+//         setTimeout(function () { cnode.writeAttrsReq('/3303/0/5700', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 3000);
 //         setTimeout(function () { cnode.writeAttrsReq('/3303/0/5701', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 8000);
 //         setTimeout(function () { cnode.writeAttrsReq('/3303/0/5702', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 13000);
 //         setTimeout(function () { cnode.writeAttrsReq('/3303/0/5703', { 'pmin': 10, 'pmax': 30, 'gt': 0 }, reqHandler); }, 18000);
