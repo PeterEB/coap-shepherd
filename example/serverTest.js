@@ -51,13 +51,13 @@ function handler (msg) {
     
     if (msg.type === 'devIncoming') {
         cnode = msg.cnode;
-        console.log(cnode);
+        console.log(cnode.dump());
 
         // cnode.readReq('/3303/0', reqHandler);
 
 // // read test
-        setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
-        setTimeout(function () { cnode.readReq('/3303/0/5701', reqHandler); }, 10000);
+        // setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
+        // setTimeout(function () { cnode.readReq('/3303/0/5701', reqHandler); }, 10000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5702', reqHandler); }, 15000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5704', reqHandler); }, 25000);
