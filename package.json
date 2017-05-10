@@ -7,7 +7,7 @@
     "busyman": "^0.3.0",
     "coap": "^0.21.0",
     "debug": "^2.2.0",
-    "lwm2m-codec": "0.0.4",
+    "lwm2m-codec": "0.0.5",
     "lwm2m-id": "^1.6.1",
     "nedb": "^1.8.0",
     "network": "^0.2.1",
