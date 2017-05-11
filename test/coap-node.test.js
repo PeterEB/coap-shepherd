@@ -49,7 +49,6 @@ describe('coap-node', function () {
             emit: function () {},
             request: function (req, callback) {
                 var deferred = Q.defer();
-                console.log(req);
                 if (_.isEqual(req, reqObj)) 
                     deferred.resolve(rspObj);
 
