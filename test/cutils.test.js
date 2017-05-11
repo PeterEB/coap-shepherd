@@ -88,39 +88,6 @@ describe('cutils', function () {
             expect(function () { cutils.decodeLinkFormat('x'); }).not.to.throw();
         });
 
-        it('#.encodeJson()', function () {
-            expect(function () { cutils.encodeJson('x', 'y'); }).to.throw();
-            expect(function () { cutils.encodeJson('x/y', 'y'); }).to.throw();
-            expect(function () { cutils.encodeJson('x', 5); }).to.throw();
-            expect(function () { cutils.encodeJson('x/y', 5); }).to.throw();
-            expect(function () { cutils.encodeJson('x', []); }).to.throw();
-            expect(function () { cutils.encodeJson(5, 'y'); }).to.throw();
-            expect(function () { cutils.encodeJson(1, 5); }).to.throw();
-            expect(function () { cutils.encodeJson({}, 'x'); }).to.throw();
-            expect(function () { cutils.encodeJson([], 'x'); }).to.throw();
-            expect(function () { cutils.encodeJson(); }).to.throw();
-
-            expect(function () { cutils.encodeJson('x/y/z', 'y'); }).not.to.throw();
-            expect(function () { cutils.encodeJson('x/y/z', 5); }).not.to.throw();
-            expect(function () { cutils.encodeJson('x', {}); }).not.to.throw();
-        });
-
-        it('#.decodeJson()', function () {        
-            expect(function () { cutils.decodeJson('x', 'y'); }).to.throw();
-            expect(function () { cutils.decodeJson('x/y', 'y'); }).to.throw();
-            expect(function () { cutils.decodeJson('x', 5); }).to.throw();
-            expect(function () { cutils.decodeJson('x/y', 5); }).to.throw();
-            expect(function () { cutils.decodeJson('x', []); }).to.throw();
-            expect(function () { cutils.decodeJson(5, 'y'); }).to.throw();
-            expect(function () { cutils.decodeJson(1, 5); }).to.throw();
-            expect(function () { cutils.decodeJson({}, 'x'); }).to.throw();
-            expect(function () { cutils.decodeJson([], 'x'); }).to.throw();
-            expect(function () { cutils.decodeJson(); }).to.throw();
-
-            expect(function () { cutils.decodeJson('x/y/z', {e:[]}); }).not.to.throw();
-            expect(function () { cutils.decodeJson('x', {e:[]}); }).not.to.throw();
-        });
-
         it('#.dotPath()', function () {        
             expect(function () { cutils.dotPath(5); }).to.throw();
             expect(function () { cutils.dotPath({}); }).to.throw();
@@ -230,19 +197,6 @@ describe('cutils', function () {
         it('#.decodeLinkFormat()', function () {
             expect(cutils.decodeLinkFormat('</1/2>;pmin=10;pmax=60,</1/2/1>,</1/2/2>')).to.be.eql({ path:'/1/2', attrs: { pmin: 10, pmax: 60 }, resrcList: ['/1/2/1', '/1/2/2'] });
             expect(cutils.decodeLinkFormat('</1/2/1>;pmin=10;pmax=60;gt=1;lt=100;st=1')).to.be.eql({ path:'/1/2/1', attrs: { pmin: 10, pmax: 60, gt: 1, lt: 100, st: 1 }});
-        });
-
-        it('#.encodeJson()', function () {
-            expect(cutils.encodeJson('x', { 1: {  0: 'x', 1: 5 }, 2: {  0: true }})).to.be.eql({ bn: '/x', e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] });
-            expect(cutils.encodeJson('x/y', { 0: 'x', 1: 5, 2: new Date(100000) })).to.be.eql({ bn: '/x/y', e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }, { n: '2', v: 100000 }] });
-            expect(cutils.encodeJson('x/y/z', 5)).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 5}]});
-            expect(cutils.encodeJson('x/y/z', new Date(100000))).to.be.eql({ bn: '/x/y/z', e: [{ n: '', v: 100000}]});
-        });
-
-        it('#.decodeJson()', function () {
-            expect(cutils.decodeJson('x', { e: [{ n: '1/0', sv: 'x' }, { n: '1/1', v: 5 }, { n: '2/0', bv: true }] })).to.be.eql({ 1: {  0: 'x', 1: 5 }, 2: {  0: true }});
-            expect(cutils.decodeJson('x/y', { e: [{ n: '0', sv: 'x' }, { n: '1', v: 5 }] })).to.be.eql({  0: 'x', 1: 5 });
-            expect(cutils.decodeJson('x/y/z', { e: [{ n: '', v: 5}]})).to.be.eql(5);
         });
 
         it('#.dotPath()', function () {
