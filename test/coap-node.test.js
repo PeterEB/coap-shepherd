@@ -574,7 +574,7 @@ describe('coap-node', function () {
                         'Content-Format': 'application/link-format'
                     },
                     code: '2.05',
-                    payload: '</x/0/x0>;pmin=10;pmax=60'
+                    payload: obj
                 };
 
                 node.discoverReq('/x/0/x0').then(function (rsp) {
@@ -607,7 +607,7 @@ describe('coap-node', function () {
                         'Content-Format': 'application/link-format'
                     },
                     code: '2.05',
-                    payload: '</x/0>;pmin=10;pmax=60,</x/0/x0>,</x/0/x1>'
+                    payload: obj
                 };
 
                 node.discoverReq('/x/0').then(function (rsp) {
@@ -640,7 +640,7 @@ describe('coap-node', function () {
                         'Content-Format': 'application/link-format'
                     },
                     code: '2.05',
-                    payload: '</x>;pmin=10;pmax=60,</x/0/x0>,</x/0/x1>,</x/1/x0>,</x/1/x1>'
+                    payload: obj
                 };
 
                 node.discoverReq('/x').then(function (rsp) {
