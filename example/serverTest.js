@@ -53,6 +53,10 @@ function handler (msg) {
         cnode = msg.cnode;
         console.log(cnode.dump());
 
+        setTimeout(function () { cnode.readReq('/3312/0/5850', reqHandler); }, 3000);
+        setTimeout(function () { cnode.writeReq('/3312/0/5850', true, reqHandler); }, 5000);
+        setTimeout(function () { cnode.readReq('/3312/0/5850', reqHandler); }, 7000);
+
 // // read test
 //         setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5701', reqHandler); }, 10000);
@@ -95,7 +99,7 @@ function handler (msg) {
 //         setTimeout(function () { cnode.executeReq('/3303/0/5704', ['Peter', 'world'], reqHandler); }, 25000);
 
 // // observe test
-        setTimeout(function () { cnode.observeReq('/3303/0/5702', reqHandler); }, 5000);
+//         setTimeout(function () { cnode.observeReq('/3303/0/5700', reqHandler); }, 5000);
 //         setTimeout(function () { cnode.observeReq('/3303/0/5701', reqHandler); }, 10000);
 //         setTimeout(function () { cnode.observeReq('/3303/0/5702', reqHandler); }, 15000);
 //         setTimeout(function () { cnode.observeReq('/3303/0/5703', reqHandler); }, 20000);
