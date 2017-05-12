@@ -1,13 +1,13 @@
 {
   "name": "coap-shepherd",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Network server and manager for lightweight M2M (LWM2M).",
   "main": "index.js",
   "dependencies": {
     "busyman": "^0.3.0",
     "coap": "^0.21.0",
     "debug": "^2.2.0",
-    "lwm2m-codec": "0.0.7",
+    "lwm2m-codec": "0.0.8",
     "lwm2m-id": "^1.6.1",
     "nedb": "^1.8.0",
     "network": "^0.2.1",
