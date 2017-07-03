@@ -712,16 +712,18 @@ describe('coap-node', function () {
                     hostname: '192.168.1.100',
                     port: '5685',
                     pathname: '/x/0/x0',
-                    method: 'GET',
+                    method: 'GET', 
+                    options: { Accept: 'application/tlv' },
                     observe: true
                 };
-                rspObj = new stream.Readable();
-                rspObj.headers = { 'Content-Format': 'text/plain' };
+                rspObj.headers = { 'Content-Format': 'application/tlv' };
                 rspObj.code = '2.05';
                 rspObj.payload = 10;
                 rspObj.close = function () {};
+                rspObj.once = function () {};
 
                 node.observeReq('/x/0/x0').then(function (rsp) {
+                    console.log(rsp);
                     if (rsp.status === '2.05' && rsp.data === 10)
                         done();
                 });
@@ -738,14 +740,14 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0',
                     method: 'GET',
+                    options: { Accept: 'application/tlv' },
                     observe: true
                 };
-                rspObj = new stream.Readable();
-
-                rspObj.headers = { 'Content-Format': 'text/plain' };
+                rspObj.headers = { 'Content-Format': 'application/tlv' };
                 rspObj.code = '2.05';
                 rspObj.payload = obj;
                 rspObj.close = function () {};
+                rspObj.once = function () {};
 
                 node.observeReq('/x/0').then(function (rsp) {
                     if (rsp.status === '2.05' && _.isEqual(rsp.data, obj))

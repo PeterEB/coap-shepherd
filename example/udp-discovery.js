@@ -44,3 +44,23 @@ function errHandler (err) {
 function handler (msg) {
     console.log(msg.data);
 }
+
+function handler (msg) {
+    var cnode;
+    console.log(msg.data);
+    
+    switch (msg.type) {
+        case 'devStatus':
+            cnode = msg.cnode;
+            if (msg.data === 'online') {
+                setTimeout(function () { cnode.observeReq('/buzzer/0/onOff', reqHandler); }, 2000);
+                setTimeout(function () { cnode.writeReq('/buzzer/0/onOff', true, reqHandler); }, 4000);
+                setTimeout(function () { cnode.writeReq('/buzzer/0/onOff', false, reqHandler); }, 6000);
+            }
+            break;
+
+        default:
+            // Not deal with other msg.type in this example
+            break;
+    }
+}
