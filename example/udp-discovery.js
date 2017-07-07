@@ -4,7 +4,7 @@ var discover = new Discovery();
 
 var cnode;
 
-var name = 'coap-shepherd-ip-broadcast',
+var name = 'freebird-demo-ip-broadcast',
     interval = 500,
     available = true,
     serv = {

@@ -2,7 +2,7 @@ var shepherd = require('../index.js');
 
 shepherd.on('ready', function () {
     console.log('>> coap-shepherd server start!');
-    
+
     shepherd.permitJoin(180);
 });
 
@@ -46,16 +46,10 @@ function errHandler (err) {
 
 function handler (msg) {
     var cnode;
-    console.log(msg.type);
-    console.log(msg.data);
+    console.log(msg.type + ': ' + msg.data);
     
     if (msg.type === 'devIncoming') {
         cnode = msg.cnode;
-        console.log(cnode.dump());
-
-        setTimeout(function () { cnode.readReq('/3312/0/5850', reqHandler); }, 3000);
-        setTimeout(function () { cnode.writeReq('/3312/0/5850', true, reqHandler); }, 5000);
-        setTimeout(function () { cnode.readReq('/3312/0/5850', reqHandler); }, 7000);
 
 // // read test
 //         setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
@@ -63,7 +57,7 @@ function handler (msg) {
 //         setTimeout(function () { cnode.readReq('/3303/0/5702', reqHandler); }, 15000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5703', reqHandler); }, 20000);
 //         setTimeout(function () { cnode.readReq('/3303/0/5704', reqHandler); }, 25000);
-//         setTimeout(function () { cnode.readReq('/3303/0', reqHandler); }, 30000);
+        setTimeout(function () { cnode.readReq('/3303/0', reqHandler); }, 3000);
         
 // // discover test
 //         setTimeout(function () { cnode.discoverReq('/3303/0/5700', reqHandler); }, 5000);

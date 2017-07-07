@@ -21,9 +21,8 @@ var devAttrs = {
         mac: 'AA:BB:CC:DD:EE:00',
         version: '1.0.0',
         objList: { x: [0, 1] },
-        opts: {
-            hb: true
-        }
+        ct: '11543',
+        heartbeatEnabled: true
     };
 
 var sObj = {
@@ -420,7 +419,8 @@ describe('coap-node', function () {
                     hostname: '192.168.1.100',
                     port: '5685',
                     pathname: '/x/0/x0',
-                    method: 'GET'
+                    method: 'GET',
+                    options: { Accept: 'application/json' }
                 };
                 rspObj = {
                     code: '2.05',
@@ -443,7 +443,8 @@ describe('coap-node', function () {
                     hostname: '192.168.1.100',
                     port: '5685',
                     pathname: '/x/0',
-                    method: 'GET'
+                    method: 'GET',
+                    options: { Accept: 'application/json' }
                 };
                 rspObj = {
                     code: '2.05',
@@ -472,7 +473,8 @@ describe('coap-node', function () {
                     hostname: '192.168.1.100',
                     port: '5685',
                     pathname: '/x',
-                    method: 'GET'
+                    method: 'GET',
+                    options: { Accept: 'application/json' }
                 };
                 rspObj = {
                     code: '2.05',
@@ -493,9 +495,9 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0/x0',
                     method: 'PUT',
-                    payload: new Buffer([0xc1, 0x00, 0x0a]),
+                    payload: new Buffer([0x7b, 0x22, 0x62, 0x6e, 0x22, 0x3a, 0x22, 0x2f, 0x78, 0x2f, 0x30, 0x2f, 0x78, 0x30, 0x22, 0x2c, 0x22, 0x65, 0x22, 0x3a, 0x5b, 0x7b, 0x22, 0x6e, 0x22, 0x3a, 0x22, 0x22, 0x2c, 0x22, 0x76, 0x22, 0x3a, 0x31, 0x30, 0x7d, 0x5d, 0x7d]),
                     options: {
-                        'Content-Format': 'application/tlv'
+                        'Content-Format': 'application/json'
                     }
                 };
                 rspObj = {
@@ -514,9 +516,9 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0',
                     method: 'PUT',
-                    payload: new Buffer([0x06, 0x00, 0xc1, 0x00, 0x0a, 0xc1, 0x00, 0x14]),
+                    payload: new Buffer([0x7b, 0x22, 0x62, 0x6e, 0x22, 0x3a, 0x22, 0x2f, 0x78, 0x2f, 0x30, 0x22, 0x2c, 0x22, 0x65, 0x22, 0x3a, 0x5b, 0x7b, 0x22, 0x6e, 0x22, 0x3a, 0x22, 0x78, 0x30, 0x22, 0x2c, 0x22, 0x76, 0x22, 0x3a, 0x31, 0x30, 0x7d, 0x2c, 0x7b, 0x22, 0x6e, 0x22, 0x3a, 0x22, 0x78, 0x31, 0x22, 0x2c, 0x22, 0x76, 0x22, 0x3a, 0x32, 0x30, 0x7d, 0x5d, 0x7d]),
                     options: {
-                        'Content-Format': 'application/tlv'
+                        'Content-Format': 'application/json'
                     }
                 };
                 rspObj = {
@@ -712,8 +714,8 @@ describe('coap-node', function () {
                     hostname: '192.168.1.100',
                     port: '5685',
                     pathname: '/x/0/x0',
-                    method: 'GET', 
-                    options: { Accept: 'application/tlv' },
+                    method: 'GET',
+                    options: { Accept: 'application/json' },
                     observe: true
                 };
                 rspObj.headers = { 'Content-Format': 'application/tlv' };
@@ -723,7 +725,6 @@ describe('coap-node', function () {
                 rspObj.once = function () {};
 
                 node.observeReq('/x/0/x0').then(function (rsp) {
-                    console.log(rsp);
                     if (rsp.status === '2.05' && rsp.data === 10)
                         done();
                 });
@@ -740,7 +741,7 @@ describe('coap-node', function () {
                     port: '5685',
                     pathname: '/x/0',
                     method: 'GET',
-                    options: { Accept: 'application/tlv' },
+                    options: { Accept: 'application/json' },
                     observe: true
                 };
                 rspObj.headers = { 'Content-Format': 'application/tlv' };
@@ -825,6 +826,7 @@ describe('coap-node', function () {
                     version: '1.0.0',
                     objList: { x: [0, 1] },
                     observedList: [],
+                    heartbeatEnabled: true,
                     so: {
                         x: sObj
                     }
@@ -861,6 +863,7 @@ describe('coap-node', function () {
                     version: '1.0.0',
                     objList: { x: [0, 1] },
                     observedList: [],
+                    heartbeatEnabled: true,
                     so: {
                         x: sObj
                     }
@@ -887,6 +890,7 @@ describe('coap-node', function () {
                     version: '1.0.0',
                     objList: { x: [0, 1] },
                     observedList: [],
+                    heartbeatEnabled: true,
                     so: {
                         x: sObj
                     }
