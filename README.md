@@ -19,9 +19,10 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-shepherd/wiki).
 
 [**OMA Lightweight M2M**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) (LWM2M) is a resource constrained device management protocol relies on [**CoAP**](https://tools.ietf.org/html/rfc7252). And **CoAP** is an application layer protocol that allows devices to communicate with each other RESTfully over the Internet.  
 
-**coap-shepherd** and **coap-node** modules aim to provide a simple way to build and manage a **LWM2M** network.
+**coap-shepherd**, **coap-node** and **lwm2m-bs-server** modules aim to provide a simple way to build and manage a **LWM2M** network.
 * Server-side library: **coap-shepherd** (this module)
 * Client-side library: [**coap-node**](https://github.com/PeterEB/coap-node)
+* Bootstrap server library: [**lwm2m-bs-server**](https://github.com/PeterEB/lwm2m-bs-server)
 * [**A simple demo webapp**](https://github.com/PeterEB/quick-demo)
 
 ![coap-shepherd net](https://raw.githubusercontent.com/PeterEB/documents/master/coap-shepherd/media/lwm2m_net.png) 
