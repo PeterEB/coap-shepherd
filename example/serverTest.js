@@ -1,4 +1,13 @@
+var fs = require('fs'),
+    path = require('path');
+
 var shepherd = require('../index.js');
+
+try {
+    fs.unlinkSync(path.resolve('../lib/database/coap.db'));
+} catch (e) {
+    console.log(e);
+}
 
 shepherd.on('ready', function () {
     console.log('>> coap-shepherd server start!');
