@@ -60,13 +60,6 @@ function handler (msg) {
     if (msg.type === 'devIncoming') {
         cnode = msg.cnode;
 
-setTimeout(function () { cnode.observeReq('/31024/10', reqHandler); }, 1000);
-// setTimeout(function () { cnode.observeReq('/3303/0', reqHandler); }, 30000);
-setTimeout(function () { cnode.writeReq('/31024/10', { '1': 33 }, reqHandler); }, 3000);
-setTimeout(function () { cnode.writeReq('/31024/10', { '1': 34 }, reqHandler); }, 4000);
-setTimeout(function () { cnode.writeReq('/31024/10', { '1': 35 }, reqHandler); }, 5000);
-setTimeout(function () { cnode.readReq('/31024/10/1', reqHandler); }, 6000);
-
 // read test
         // setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);
         // setTimeout(function () { cnode.readReq('/3303/0/5701', reqHandler); }, 10000);
@@ -124,5 +117,7 @@ setTimeout(function () { cnode.readReq('/31024/10/1', reqHandler); }, 6000);
 
 // remove test
 //        setTimeout(function () { shepherd.remove('nodeTest'); }, 10000);
-    } 
+    } else if (msg.type === 'devNotify') {
+        console.log(msg.data);
+    }
 }

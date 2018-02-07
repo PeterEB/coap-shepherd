@@ -31,7 +31,7 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-shepherd/wiki).
 
 * It is a **LWM2M** Server application framework running on node.js.  
 * It follows most parts of **LWM2M** specification to meet the requirements of a machine network and devices management.  
-* It works well with [**Wakaama**](https://github.com/eclipse/wakaama).
+* It works well with [**Leshan**](https://github.com/eclipse/leshan) and [**Wakaama**](https://github.com/eclipse/wakaama).
 * Supports functionalities, such as permission of device joining, reading resources, writing resources, observing resources, and executing a procedure on a remote device.  
 * It follows [**IPSO**](http://www.ipso-alliance.org/smart-object-guidelines/) data model to let you allocate and query resources on remote devices with semantic URIs in a comprehensive manner. 
 
