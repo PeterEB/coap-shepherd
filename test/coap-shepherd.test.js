@@ -165,6 +165,21 @@ describe('coap-shepherd', function () {
             });
         });
 
+        describe('#.acceptDevIncoming()', function () {
+            it('should throw TypeError if predicate is not a function', function () {
+                expect(function () { return shepherd.acceptDevIncoming(); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(undefined); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(null); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(NaN); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming('xx'); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(10); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming({}); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming([]); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(true); }).to.throw(TypeError);
+                expect(function () { return shepherd.acceptDevIncoming(new Date()); }).to.throw(TypeError);
+            });
+        });
+
         describe('#._newClientId()', function () {
             it('should throw TypeError if id is not a number', function () {
                 expect(function () { return shepherd._newClientId(null); }).to.throw(TypeError);
@@ -596,13 +611,13 @@ describe('coap-shepherd', function () {
                     }
                 };
 
-                shepherd.acceptDevIncoming = function (devInfo, callback) {
+                shepherd.acceptDevIncoming(function (devInfo, callback) {
                     if (devInfo.clientName === 'cnode03') {
                         callback(null, false);
                     } else {
                         callback(null, true);
                     }
-                };
+                });
 
                 emitClintReqMessage(shepherd, {
                     code: '0.01',
@@ -628,9 +643,9 @@ describe('coap-shepherd', function () {
                     }
                 };
 
-                shepherd.acceptDevIncoming = function (devInfo, callback) {
+                shepherd.acceptDevIncoming(function (devInfo, callback) {
                     callback(null, true);
-                };
+                });
 
                 emitClintReqMessage(shepherd, {
                     code: '0.01',
