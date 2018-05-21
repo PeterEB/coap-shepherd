@@ -1,6 +1,6 @@
 {
   "name": "coap-shepherd",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Network server and manager for lightweight M2M (LWM2M).",
   "main": "index.js",
   "dependencies": {
