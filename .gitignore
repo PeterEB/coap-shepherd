@@ -3,7 +3,14 @@ logs
 *.log
 npm-debug.log*
 
+# Development
+.idea/
+
+# Test data
+test/database_test/
+
 # Runtime data
+lib/database/
 pids
 *.pid
 *.seed
