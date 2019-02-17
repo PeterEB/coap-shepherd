@@ -115,6 +115,23 @@ describe('coap-shepherd', function () {
             });
         });
 
+        describe('#.alwaysPermitJoin()', function () {
+            it('should throw TypeError if permit is not a boolean', function () {
+                expect(function () { return shepherd.alwaysPermitJoin(); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(undefined); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(null); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin('xx'); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(NaN); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(10); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin([]); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin({}); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(new Date()); }).to.throw(TypeError);
+                expect(function () { return shepherd.alwaysPermitJoin(function () {}); }).to.throw(TypeError);
+
+                expect(function () { return shepherd.alwaysPermitJoin(true); }).not.to.throw(TypeError);
+            });
+        });
+
         describe('#.request()', function () {
             it('should throw TypeError if reqObj is not an object', function () {
                 expect(function () { return shepherd.request(); }).to.throw(TypeError);
@@ -213,9 +230,68 @@ describe('coap-shepherd', function () {
         });
 
         describe('#.permitJoin()', function () {
-            it('should open permitJoin', function () {
+            it('should open permitJoin when time > 0', function () {
                 shepherd.permitJoin(180);
                 expect(shepherd._joinable).to.be.eql(true);
+            });
+
+            it('should close permitJoin when time == 0', function () {
+                shepherd.permitJoin(0);
+                expect(shepherd._joinable).to.be.eql(false);
+            });
+
+            it('should open permitJoin when time > 0 after alwaysPermitJoin(false)', function () {
+                shepherd.alwaysPermitJoin(false);
+                shepherd.permitJoin(180);
+                expect(shepherd._joinable).to.be.eql(true);
+            });
+
+            it('should close permitJoin when time == 0 after alwaysPermitJoin(true)', function () {
+                shepherd.alwaysPermitJoin(true);
+                shepherd.permitJoin(0);
+                expect(shepherd._joinable).to.be.eql(false);
+            });
+        });
+
+        describe('#.alwaysPermitJoin()', function () {
+            it('should open permitJoin when permit is true', function () {
+                var result = shepherd.alwaysPermitJoin(true);
+                expect(result).to.be.eql(true);
+                expect(shepherd._joinable).to.be.eql(true);
+            });
+
+            it('should close permitJoin when permit is false', function () {
+                shepherd.alwaysPermitJoin(false);
+                expect(shepherd._joinable).to.be.eql(false);
+            });
+
+            it('should clear _permitJoinTimer when permit is true', function () {
+                shepherd.permitJoin(180);
+                var result = shepherd.alwaysPermitJoin(true);
+                expect(result).to.be.eql(true);
+                expect(shepherd._joinable).to.be.eql(true);
+                expect(shepherd._permitJoinTimer).to.be.eql(null);
+            });
+
+            it('should clear _permitJoinTimer when permit is false', function () {
+                shepherd.permitJoin(180);
+                var result = shepherd.alwaysPermitJoin(false);
+                expect(result).to.be.eql(true);
+                expect(shepherd._joinable).to.be.eql(false);
+                expect(shepherd._permitJoinTimer).to.be.eql(null);
+            });
+
+            it('should not open permitJoin when server is not enabled', function () {
+                shepherd._joinable = false;
+                shepherd._enabled = false;
+                var result = shepherd.alwaysPermitJoin(true);
+                expect(result).to.be.eql(false);
+                expect(shepherd._joinable).to.be.eql(false);
+            });
+
+            after(function () {
+                shepherd._enabled = true;
+                shepherd.alwaysPermitJoin(true);
             });
         });
 
