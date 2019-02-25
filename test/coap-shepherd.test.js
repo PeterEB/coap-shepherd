@@ -11,7 +11,19 @@ var fs = require('fs'),
 chai.use(sinonChai);
 
 var CoapNode = require('../lib/components/coap-node'),
-    shepherd = require('../lib/coap-shepherd');
+    shepherd = require('../lib/coap-shepherd'),
+    init = require('../lib/init');
+
+var interface6 = {
+        ip_address: '::1',
+        gateway_ip: '::c0a8:0101',
+        mac_address: '00:00:00:00:00:00'
+    },
+    interface4 = {
+        ip_address: '127.0.0.1',
+        gateway_ip: '192.168.1.1',
+        mac_address: '00:00:00:00:00:00'
+    };
 
 try {
     fs.unlinkSync(path.resolve('./lib/database/coap.db'));
@@ -31,6 +43,23 @@ describe('coap-shepherd', function () {
     });
     
     describe('Signature Check', function () {
+        describe('#.constructor()', function () {
+            var CoapShepherd = shepherd.constructor;
+            it('should throw TypeError if config is given but not a object', function () {
+                expect(function () { return new CoapShepherd(null); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd('xx'); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd(NaN); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd(10); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd([]); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd(true); }).to.throw(TypeError);
+                expect(function () { return new CoapShepherd(function () {}); }).to.throw(TypeError);
+
+                expect(function () { return new CoapShepherd(); }).not.to.throw(TypeError);
+                expect(function () { return new CoapShepherd(undefined); }).not.to.throw(TypeError);
+                expect(function () { return new CoapShepherd({}); }).not.to.throw(TypeError);
+            });
+        });
+
         describe('#.find()', function () {
             it('should throw TypeError if clientName is not a string', function () {
                 expect(function () { return shepherd.find(); }).to.throw(TypeError);
@@ -216,7 +245,75 @@ describe('coap-shepherd', function () {
     });
 
     describe('Functional Check', function () {
+        var _updateNetInfoStub, testDbPath = __dirname + '/../lib/database/test.db';
+
+        before(function () {
+            _updateNetInfoStub = sinon.stub(init, '_updateNetInfo', function (shepherd, callback) {
+                var deferred = Q.defer();
+
+                setTimeout(function () {
+                    var intf = (shepherd._config.connectionType === 'udp6') ? interface6 : interface4;
+                    shepherd._net.intf = intf.name;
+                    shepherd._net.ip = intf.ip_address;
+                    shepherd._net.mac = intf.mac_address;
+                    shepherd._net.routerIp = intf.gateway_ip;
+                    deferred.resolve(_.cloneDeep(shepherd._net));
+                }, 10);
+
+                return deferred.promise.nodeify(callback);
+            });
+
+        });
+
+        after(function () {
+            _updateNetInfoStub.restore();
+            fs.unlinkSync(testDbPath);
+        });
+
         this.timeout(5000);
+
+        describe('#.constructor()', function () {
+            var CoapShepherd = shepherd.constructor;
+
+            it('should create an instance when passing no arguments', function () {
+                var created = new CoapShepherd();
+                expect(created).to.be.not.null;
+                expect(created).to.be.instanceOf(CoapShepherd);
+                expect(created._config).to.be.an('object');
+                expect(created._config.connectionType).to.be.eql('udp4');
+                expect(created._config.ip).to.be.eql('127.0.0.1');
+                expect(created._config.port).to.be.eql(5683);
+                expect(created._config.dbPath).to.be.null;
+                expect(created._config.reqTimeout).to.be.eql(60);
+                expect(created._config.hbTimeout).to.be.eql(60);
+                expect(created._config.defaultDbFolder).to.be.a('string');
+                expect(created._config.defaultDbFolder.split('/').pop()).to.be.eql('database');
+                expect(created._config.defaultDbPath).to.be.a('string');
+                expect(created._config.defaultDbPath.split('/').pop()).to.be.eql('coap.db');
+            });
+
+            it('should create an instance when passing config argument', function () {
+                var created = new CoapShepherd({
+                    connectionType: 'udp6',
+                    ip: '::2',
+                    port: 1234,
+                    hbTimeout: 45,
+                    defaultDbPath: testDbPath
+                });
+                expect(created).to.be.not.null;
+                expect(created).to.be.instanceOf(CoapShepherd);
+                expect(created._config).to.be.an('object');
+                expect(created._config.connectionType).to.be.eql('udp6');
+                expect(created._config.ip).to.be.eql('::2');
+                expect(created._config.port).to.be.eql(1234);
+                expect(created._config.dbPath).to.be.null;
+                expect(created._config.reqTimeout).to.be.eql(60);
+                expect(created._config.hbTimeout).to.be.eql(45);
+                expect(created._config.defaultDbFolder).to.be.a('string');
+                expect(created._config.defaultDbFolder.split('/').pop()).to.be.eql('database');
+                expect(created._config.defaultDbPath).to.be.eql(testDbPath);
+            });
+        });
 
         describe('#.start()', function () {
             it('should start shepherd', function (done) {
