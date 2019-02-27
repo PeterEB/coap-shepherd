@@ -11,7 +11,8 @@ var fs = require('fs'),
 chai.use(sinonChai);
 
 var Coapdb = require('../lib/components/coapdb'),
-    CoapNode = require('../lib/components/coap-node');
+    CoapNode = require('../lib/components/coap-node'),
+    defaultConfig = require('../lib/config');
 
 var devAttrs = {
         clientName: 'coap-client',
@@ -54,6 +55,7 @@ describe('coap-node', function () {
                 return deferred.promise.nodeify(callback);
             },
             _newClientId: function () { return 1; },
+            _config: Object.assign({}, defaultConfig),
             _coapdb: new Coapdb(dbPath)
         };
         node = new CoapNode(fakeShp, devAttrs);
@@ -709,7 +711,7 @@ describe('coap-node', function () {
         });
 
         describe('#.observeReq()', function () {
-            it('should observe Resource and return status 2.05', function (done) {
+            it('should observe Resource and return status 2.05 for number data', function (done) {
                 reqObj = {
                     hostname: '192.168.1.100',
                     port: '5685',
@@ -730,7 +732,7 @@ describe('coap-node', function () {
                 });
             });
 
-            it('should observe Resource and return status 2.05', function (done) {
+            it('should observe Resource and return status 2.05 for object data', function (done) {
                 var obj = {
                     x0: 10,
                     x1: 20
@@ -755,6 +757,53 @@ describe('coap-node', function () {
                         done();
                 });
             });
+
+            it('should set observeStream._disableFiltering to false by default', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    options: { Accept: 'application/json' },
+                    observe: true
+                };
+                rspObj.headers = { 'Content-Format': 'application/tlv' };
+                rspObj.code = '2.05';
+                rspObj.payload = 10;
+                rspObj.close = function () {};
+                rspObj.once = function () {};
+
+                node.observeReq('/x/0/x0').then(function (rsp) {
+                    expect(rspObj._disableFiltering).to.equal(false);
+                    if (rsp.status === '2.05' && rsp.data === 10)
+                        done();
+                });
+            });
+
+            it('should set observeStream._disableFiltering to true when shepherd config is set so', function (done) {
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    options: { Accept: 'application/json' },
+                    observe: true
+                };
+                rspObj.headers = { 'Content-Format': 'application/tlv' };
+                rspObj.code = '2.05';
+                rspObj.payload = 10;
+                rspObj.close = function () {};
+                rspObj.once = function () {};
+                node.shepherd._config.disableFiltering = true;
+
+                node.observeReq('/x/0/x0').then(function (rsp) {
+                    node.shepherd._config.disableFiltering = defaultConfig.disableFiltering;
+                    expect(rspObj._disableFiltering).to.equal(true);
+                    if (rsp.status === '2.05' && rsp.data === 10)
+                        done();
+                });
+            });
+
         });
 
         describe('#.cancelObserveReq()', function () {
