@@ -493,57 +493,6 @@ describe('coap-shepherd', function () {
             });
         });
 
-        describe('#config.autoReadResources', function () {
-            it('should not call cnode._readAllResource when autoReadResources is false', function (done) {
-                var shepherd = new CoapShepherd({port: 5684, defaultDbPath: testDbPath, autoReadResources: false});
-                shepherd.start().then(function () {
-                    shepherd.alwaysPermitJoin(true);
-                    var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
-                            return null;
-                        }),
-                        observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
-                            return Q.resolve({
-                                status: '2.05',
-                                data: 'hb'
-                            });
-                        }),
-                        rsp = {},
-                        cnode,
-                        regCallback = function (msg) {
-                            if (msg.type === 'devIncoming') {
-                                cnode = msg.cnode;
-                                expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
-                                expect(rsp.end).to.have.been.calledWith('');
-                                expect(_readAllResourceStub).to.have.not.been.called;
-                                if (shepherd.find('cnode02') === cnode) {
-                                    _readAllResourceStub.restore();
-                                    observeReqStub.restore();
-                                    shepherd.removeListener('ind', regCallback);
-                                    done();
-                                }
-                            }
-                        };
-
-                    rsp.setOption = sinon.spy();
-                    rsp.end = sinon.spy();
-
-                    shepherd.on('ind', regCallback);
-
-                    emitClintReqMessage(shepherd, {
-                        code: '0.01',
-                        method: 'POST',
-                        url: '/rd?ep=cnode02&lt=86400&lwm2m=1.0.0&mac=BB:BB:BB',
-                        rsinfo: {
-                            address: '127.0.0.1',
-                            port: '5687'
-                        },
-                        payload: '</a/0>,</a/1>,</b/0>,</b/1>',
-                        headers: {}
-                    }, rsp);
-                });
-            });
-        });
-
         describe('#update cnode', function () {
             it('should update cnode lifetime', function (done) {
                 var rsp = {},
@@ -553,6 +502,105 @@ describe('coap-shepherd', function () {
                             diff = msg.data;
                             expect(rsp.end).to.have.been.calledWith('');
                             if (diff.lifetime == 87654) {
+                                shepherd.removeListener('ind', upCallback);
+                                done();
+                            }
+                        }
+                    };
+
+                rsp.end = sinon.spy();
+
+                shepherd.on('ind', upCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.02',
+                    method: 'POST',
+                    url: '/rd/1?lt=87654',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5688'
+                    },
+                    payload: '',
+                    headers: {}
+                }, rsp);
+            });
+        });
+
+        describe('#config.autoReadResources', function () {
+            var shepherd;
+
+            before(function (done) {
+                shepherd = new CoapShepherd({port: 5684, defaultDbPath: testDbPath, autoReadResources: false});
+                shepherd.start().then(function () {
+                    shepherd.alwaysPermitJoin(true);
+                    done();
+                });
+            });
+
+            it('should not call cnode._readAllResource when autoReadResources is false for register', function (done) {
+                var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
+                        return null;
+                    }),
+                    observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: 'hb'
+                        });
+                    }),
+                    rsp = {},
+                    cnode,
+                    regCallback = function (msg) {
+                        if (msg.type === 'devIncoming') {
+                            cnode = msg.cnode;
+                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
+                            expect(rsp.end).to.have.been.calledWith('');
+                            expect(_readAllResourceStub).to.have.not.been.called;
+                            if (shepherd.find('cnode02') === cnode) {
+                                _readAllResourceStub.restore();
+                                observeReqStub.restore();
+                                shepherd.removeListener('ind', regCallback);
+                                done();
+                            }
+                        }
+                    };
+
+                rsp.setOption = sinon.spy();
+                rsp.end = sinon.spy();
+
+                shepherd.on('ind', regCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.01',
+                    method: 'POST',
+                    url: '/rd?ep=cnode02&lt=86400&lwm2m=1.0.0&mac=BB:BB:BB',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5687'
+                    },
+                    payload: '</a/0>,</a/1>,</b/0>,</b/1>',
+                    headers: {}
+                }, rsp);
+            });
+
+            it('should not call cnode._readAllResource when autoReadResources is false for update', function (done) {
+                var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
+                        return null;
+                    }),
+                    _updateAttrsStub = sinon.stub(CoapNode.prototype, '_updateAttrs', function () {
+                        return Q.fcall(function () {
+                            return { lifetime: 87654, objList: {} };
+                        });
+                    }),
+                    rsp = {},
+                    cnode,
+                    upCallback = function (msg) {
+                        if (msg.type === 'devUpdate') {
+                            diff = msg.data;
+                            expect(rsp.end).to.have.been.calledWith('');
+                            expect(_readAllResourceStub).to.have.not.been.called;
+                            if (diff.lifetime == 87654) {
+                                _readAllResourceStub.restore();
+                                _updateAttrsStub.restore();
                                 shepherd.removeListener('ind', upCallback);
                                 done();
                             }
