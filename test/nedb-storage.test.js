@@ -113,8 +113,16 @@ var cnode3 = _createNode({
 });
 
 describe('nedb-storage', function () {
-    before(function () {
+    before(function (done) {
         storage = new NedbStorage('');
+        var dir = path.resolve(baseDir);
+        if (!fs.existsSync(dir))
+            fs.mkdir(dir, function (err) {
+                expect(err).to.equal(null);
+                done();
+            });
+        else
+            done();
     });
 
     describe('Constructor Check', function () {
@@ -581,6 +589,17 @@ describe('nedb-storage', function () {
                 }).done();
             });
         });
+    });
+
+    after(function (done) {
+        var dir = path.resolve(baseDir);
+        if (fs.existsSync(dir))
+            fs.rmdir(dir, function (err) {
+                // just ignore err
+                done();
+            });
+        else
+            done();
     });
 });
 
