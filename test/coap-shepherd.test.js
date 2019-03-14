@@ -11,8 +11,15 @@ var fs = require('fs'),
 chai.use(sinonChai);
 
 var CoapNode = require('../lib/components/coap-node'),
+    StorageInterface = require('../lib/components/storage-interface'),
+    NedbStorage = require('../lib/components/nedb-storage'),
     shepherd = require('../lib/coap-shepherd'),
-    init = require('../lib/init');
+    CoapShepherd = shepherd.constructor,
+    init = require('../lib/init'),
+    fixture = require('./fixture'),
+    _verifySignatureSync = fixture._verifySignatureSync,
+    _verifySignatureAsync = fixture._verifySignatureAsync,
+    _fireSetTimeoutCallbackEarlier = fixture._fireSetTimeoutCallbackEarlier;
 
 var interface6 = {
         ip_address: '::1',
@@ -25,13 +32,14 @@ var interface6 = {
         mac_address: '00:00:00:00:00:00'
     };
 
-try {
-    fs.unlinkSync(path.resolve('./lib/database/coap.db'));
-} catch (e) {
-    console.log(e);
-}
-
 describe('coap-shepherd', function () {
+    before(function (done) {
+        fs.unlink(path.resolve('./lib/database/coap.db'), function (err) {
+            expect(err).to.equal(null);
+            done();
+        });
+    });
+
     describe('Constructor Check', function () {
         it('coapShepherd', function () {
             expect(shepherd.clientIdCount).to.be.eql(1);
@@ -39,213 +47,94 @@ describe('coap-shepherd', function () {
             expect(shepherd._enabled).to.be.false;
             expect(shepherd._server).to.be.eql(null);
             expect(shepherd._hbChecker).to.be.eql(null);
+            expect(shepherd._storage).to.be.instanceOf(NedbStorage);
         });
     });
-    
+
     describe('Signature Check', function () {
         describe('#.constructor()', function () {
-            var CoapShepherd = shepherd.constructor;
-            it('should throw TypeError if config is given but not a object', function () {
-                expect(function () { return new CoapShepherd(null); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd('xx'); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd(NaN); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd(10); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd([]); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd(true); }).to.throw(TypeError);
-                expect(function () { return new CoapShepherd(function () {}); }).to.throw(TypeError);
+            it('should throw TypeError if config is given but not an object', function () {
+                _verifySignatureSync(function (arg) { return new CoapShepherd(arg); }, ['undefined', 'object']);
+            });
 
-                expect(function () { return new CoapShepherd(); }).not.to.throw(TypeError);
-                expect(function () { return new CoapShepherd(undefined); }).not.to.throw(TypeError);
-                expect(function () { return new CoapShepherd({}); }).not.to.throw(TypeError);
+            it('should throw TypeError if config.storage is given but not an instance of StorageInterface', function () {
+                _verifySignatureSync(function (arg) {
+                    var options = { storage: arg };
+                    return new CoapShepherd(options);
+                }, ['undefined', 'null', new StorageInterface()]);
             });
         });
 
         describe('#.find()', function () {
             it('should throw TypeError if clientName is not a string', function () {
-                expect(function () { return shepherd.find(); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.find([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.find({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.find(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.find('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.find(arg); }, ['string']);
             });
         });
 
         describe('#.findByMacAddr()', function () {
             it('should throw TypeError if macAddr is not a string', function () {
-                expect(function () { return shepherd.findByMacAddr(); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.findByMacAddr(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.findByMacAddr('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.findByMacAddr(arg); }, ['string']);
             });
         });
 
         describe('#._findByClientId()', function () {
             it('should throw TypeError if clientId is not a string or a number', function () {
-                expect(function () { return shepherd._findByClientId(); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(null); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId([]); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId({}); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(true); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd._findByClientId(10); }).not.to.throw(TypeError);
-                expect(function () { return shepherd._findByClientId('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd._findByClientId(arg); }, ['string', 'number']);
             });
         });
 
         describe('#._findByLocationPath()', function () {
             it('should throw TypeError if clientId is not a string', function () {
-                expect(function () { return shepherd._findByLocationPath(); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(null); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(10); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath([]); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath({}); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(true); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd._findByLocationPath(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd._findByLocationPath('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd._findByLocationPath(arg); }, ['string']);
             });
         });
 
         describe('#.permitJoin()', function () {
             it('should throw TypeError if time is not a number', function () {
-                expect(function () { return shepherd.permitJoin(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.permitJoin(); }).not.to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(undefined); }).not.to.throw(TypeError);
-                expect(function () { return shepherd.permitJoin(10); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.permitJoin(arg); }, ['undefined', 'number']);
             });
         });
 
         describe('#.alwaysPermitJoin()', function () {
             it('should throw TypeError if permit is not a boolean', function () {
-                expect(function () { return shepherd.alwaysPermitJoin(); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.alwaysPermitJoin(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.alwaysPermitJoin(true); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.alwaysPermitJoin(arg); }, ['boolean']);
             });
         });
 
         describe('#.request()', function () {
             it('should throw TypeError if reqObj is not an object', function () {
-                expect(function () { return shepherd.request(); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.request('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd.request([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.request(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.request({}); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.request(arg); }, ['object']);
             });
         });
 
         describe('#.announce()', function () {
             it('should throw TypeError if msg is not a string', function () {
-                expect(function () { return shepherd.announce(); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.announce(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.announce('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.announce(arg); }, ['string']);
             });
         });
 
         describe('#.remove()', function () {
             it('should throw TypeError if clientName is not a string', function () {
-                expect(function () { return shepherd.remove(); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd.remove(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd.remove('xx'); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd.remove(arg); }, ['string']);
             });
         });
 
         describe('#.acceptDevIncoming()', function () {
             it('should throw TypeError if predicate is not a function', function () {
-                expect(function () { return shepherd.acceptDevIncoming(); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(undefined); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(null); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(10); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming({}); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming([]); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(true); }).to.throw(TypeError);
-                expect(function () { return shepherd.acceptDevIncoming(new Date()); }).to.throw(TypeError);
+                var savedPredicate = shepherd._acceptDevIncoming;
+                _verifySignatureSync(function (arg) { shepherd.acceptDevIncoming(arg); }, ['function']);
+                shepherd._acceptDevIncoming = savedPredicate;
             });
         });
 
         describe('#._newClientId()', function () {
             it('should throw TypeError if id is not a number', function () {
-                expect(function () { return shepherd._newClientId(null); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(NaN); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId('xx'); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId({}); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId([]); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(true); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(new Date()); }).to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(function () {}); }).to.throw(TypeError);
-
-                expect(function () { return shepherd._newClientId(); }).not.to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(undefined); }).not.to.throw(TypeError);
-                expect(function () { return shepherd._newClientId(10); }).not.to.throw(TypeError);
+                _verifySignatureSync(function (arg) { shepherd._newClientId(arg); }, ['undefined', 'number']);
             });
         });
     });
 
     describe('Functional Check', function () {
-        var CoapShepherd = shepherd.constructor;
         var _updateNetInfoStub, testDbPath = __dirname + '/../lib/database/test.db';
 
         before(function () {
@@ -266,62 +155,82 @@ describe('coap-shepherd', function () {
 
         });
 
-        after(function () {
+        after(function (done) {
             _updateNetInfoStub.restore();
-            fs.unlinkSync(testDbPath);
+            fs.unlink(testDbPath, function (err) {
+                expect(err).to.equal(null);
+                done();
+            });
         });
-
-        this.timeout(5000);
 
         describe('#.constructor()', function () {
             it('should create an instance when passing no arguments', function () {
                 var created = new CoapShepherd();
                 expect(created).to.be.not.null;
                 expect(created).to.be.instanceOf(CoapShepherd);
+                expect(created._storage).to.be.instanceOf(NedbStorage);
                 expect(created._config).to.be.an('object');
                 expect(created._config.connectionType).to.be.eql('udp4');
                 expect(created._config.ip).to.be.eql('127.0.0.1');
                 expect(created._config.port).to.be.eql(5683);
-                expect(created._config.dbPath).to.be.null;
                 expect(created._config.reqTimeout).to.be.eql(60);
                 expect(created._config.hbTimeout).to.be.eql(60);
-                expect(created._config.defaultDbFolder).to.be.a('string');
-                expect(created._config.defaultDbFolder.split('/').pop()).to.be.eql('database');
                 expect(created._config.defaultDbPath).to.be.a('string');
                 expect(created._config.defaultDbPath.split('/').pop()).to.be.eql('coap.db');
             });
 
             it('should create an instance when passing config argument', function () {
+                var myStorage = new StorageInterface();
+                myStorage._myFlag = 'customized';
                 var created = new CoapShepherd({
                     connectionType: 'udp6',
                     ip: '::2',
                     port: 1234,
                     hbTimeout: 45,
+                    storage: myStorage,
                     defaultDbPath: testDbPath
                 });
                 expect(created).to.be.not.null;
                 expect(created).to.be.instanceOf(CoapShepherd);
+                expect(created._storage).to.equal(myStorage);
+                expect(created._storage._myFlag).to.equal('customized');
                 expect(created._config).to.be.an('object');
                 expect(created._config.connectionType).to.be.eql('udp6');
                 expect(created._config.ip).to.be.eql('::2');
                 expect(created._config.port).to.be.eql(1234);
-                expect(created._config.dbPath).to.be.null;
                 expect(created._config.reqTimeout).to.be.eql(60);
                 expect(created._config.hbTimeout).to.be.eql(45);
-                expect(created._config.defaultDbFolder).to.be.a('string');
-                expect(created._config.defaultDbFolder.split('/').pop()).to.be.eql('database');
                 expect(created._config.defaultDbPath).to.be.eql(testDbPath);
             });
         });
 
         describe('#.start()', function () {
-            it('should start shepherd', function (done) {
-                shepherd.start().then(function () {
-                    if (_.isEqual(shepherd._registry, {}) && shepherd._enabled === true)
-                        done();
-                }).fail(function (err) {
-                    console.log(err);
+            before(function () {
+                return Q.all([1, 2, 3]
+                    .map(function (index) { return new CoapNode(shepherd, { clientName: 'myCoapNode' + index }); })
+                    .map(function (cnode) { return shepherd._storage.save(cnode); })
+                );
+            });
+
+            it('should start shepherd', function () {
+                return shepherd.start().then(function () {
+                    expect(Object.keys(shepherd._registry)).to.have.lengthOf(3);
+                    expect(shepherd._registry).to.have.property('myCoapNode1');
+                    expect(shepherd._registry['myCoapNode1']).to.be.instanceOf(CoapNode);
+                    expect(shepherd._registry['myCoapNode1'].clientName).to.equal('myCoapNode1');
+                    expect(shepherd._registry).to.have.property('myCoapNode2');
+                    expect(shepherd._registry['myCoapNode2']).to.be.instanceOf(CoapNode);
+                    expect(shepherd._registry['myCoapNode2'].clientName).to.equal('myCoapNode2');
+                    expect(shepherd._registry).to.have.property('myCoapNode3');
+                    expect(shepherd._registry['myCoapNode3']).to.be.instanceOf(CoapNode);
+                    expect(shepherd._registry['myCoapNode3'].clientName).to.equal('myCoapNode3');
+                    expect(shepherd._enabled).to.equal(true);
                 });
+            });
+
+            after(function () {
+                shepherd._registry = {};
+                return shepherd._storage.reset();
             });
         });
 
@@ -428,6 +337,7 @@ describe('coap-shepherd', function () {
 
                 rsp.setOption = sinon.spy();
                 rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier(2);
 
                 shepherd.on('ind', regCallback);
 
@@ -476,6 +386,7 @@ describe('coap-shepherd', function () {
 
                 rsp.setOption = sinon.spy();
                 rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier(2);
 
                 shepherd.on('ind', regCallback);
 
@@ -566,6 +477,7 @@ describe('coap-shepherd', function () {
 
                 rsp.setOption = sinon.spy();
                 rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier(2);
 
                 shepherd.on('ind', regCallback);
 
@@ -659,7 +571,7 @@ describe('coap-shepherd', function () {
         });
 
         describe('#checkOut cnode', function () {
-            it('should chect out and cnode status changed to sleep', function (done) {
+            it('should check out and cnode status changed to sleep', function (done) {
                 var rsp = {},
                     cnode,
                     outCallback = function (msg) {
@@ -675,6 +587,7 @@ describe('coap-shepherd', function () {
                     };
 
                 rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier();
 
                 shepherd.on('ind', outCallback);
 
@@ -699,7 +612,7 @@ describe('coap-shepherd', function () {
                 });
             });
 
-            it ('should chect out and cnode status changed to sleep with duration', function (done) {
+            it ('should check out and cnode status changed to sleep with duration', function (done) {
                 var rsp = {},
                     cnode,
                     outCallback = function (msg) {
@@ -733,12 +646,15 @@ describe('coap-shepherd', function () {
         });
 
         describe('#checkIn cnode', function () {
-            it('should chect out and cnode status changed to online', function (done) {
+            it('should check out and cnode status changed to online', function (done) {
                 var observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
                         return Q.resolve({
                             status: '2.05',
                             data: 'hb'
                         });
+                    }),
+                    delayStub = sinon.stub(_, 'delay', function (cb, time) {
+                        setImmediate(cb);
                     }),
                     rsp = {},
                     cnode,
@@ -748,6 +664,7 @@ describe('coap-shepherd', function () {
                             expect(rsp.end).to.have.been.calledWith('');
                             if (clientName === 'cnode01') {
                                 observeReqStub.restore();
+                                delayStub.restore();
                                 expect(shepherd.find('cnode01').status).to.be.eql('online');
                                 expect(shepherd.find('cnode01').port).to.be.eql('5690');
                                 shepherd.removeListener('ind', inCallback);
@@ -877,9 +794,8 @@ describe('coap-shepherd', function () {
                 rsp.end = function (msg) {
                     expect(rsp.code).to.be.eql('4.05');
                     expect(msg).to.be.eql('');
-                    if (!shepherd.find('cnode03')) {
-                        done();
-                    }
+                    expect(shepherd.find('cnode03')).to.equal(undefined);
+                    done();
                 };
 
                 shepherd.acceptDevIncoming(function (devInfo, callback) {
@@ -904,18 +820,20 @@ describe('coap-shepherd', function () {
             });
 
             it('should implement acceptDevIncoming and create dev', function (done) {
-                var rsp = {};
+                var rsp = {}, extra = { businessKey: 'hello_world' };
 
                 rsp.setOption = sinon.spy();
                 rsp.end = function (msg) {
                     expect(rsp.code).to.be.eql('2.01');
-                    if (shepherd.find('cnode03')) {
-                        done();
-                    }
+                    var node = shepherd.find('cnode03');
+                    expect(node).to.be.instanceOf(CoapNode);
+                    expect(node.clientName).to.equal('cnode03');
+                    expect(node._extra).to.equal(extra);
+                    done();
                 };
 
                 shepherd.acceptDevIncoming(function (devInfo, callback) {
-                    callback(null, true);
+                    callback(null, true, extra);
                 });
 
                 emitClintReqMessage(shepherd, {
@@ -933,35 +851,30 @@ describe('coap-shepherd', function () {
         });
 
         describe('#.stop()', function () {
-            it('should stop shepherd', function (done) {
-                shepherd.stop().then(function () {
-                    if (shepherd._enabled === false && shepherd._server === null)
-                        done();
-                }).fail(function (err) {
-                    console.log(err);
+            it('should stop shepherd', function () {
+                return shepherd.stop().then(function () {
+                    expect(shepherd._enabled).to.equal(false);
+                    expect(shepherd._server).to.equal(null);
                 });
             });
         });
 
         describe('#.reset()', function () {
-            it('should reset shepherd', function (done) {
-                shepherd.reset().then(function () {
-                    if (shepherd._enabled === true)
-                        done();
-                }).fail(function (err) {
-                    console.log(err);
+            it('should reset shepherd', function () {
+                var storageResetStub = sinon.stub(NedbStorage.prototype, 'reset', function () {});
+                return shepherd.reset().then(function () {
+                    storageResetStub.restore();
+                    expect(shepherd._enabled).to.equal(true);
+                    expect(storageResetStub).not.have.been.called;
                 });
             });
 
-            it('should remove db and reset shepherd', function (done) {
-                shepherd.reset(1).then(function () {
-                    if (shepherd._enabled === true) {
-                        console.log(shepherd._coapdb.exportClientNames());
-                        // expect(shepherd._coapdb.exportClientNames()).to.be.eql([]);
-                        done();
-                    }
-                }).fail(function (err) {
-                    console.log(err);
+            it('should remove db and reset shepherd', function () {
+                var storageResetStub = sinon.stub(NedbStorage.prototype, 'reset', function () { return Q.fcall(function () {}); });
+                return shepherd.reset(1).then(function () {
+                    storageResetStub.restore();
+                    expect(shepherd._enabled).to.equal(true);
+                    expect(storageResetStub).have.been.called;
                 });
             });
         });

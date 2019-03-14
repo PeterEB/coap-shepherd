@@ -1,7 +1,4 @@
-var fs = require('fs'),
-    path = require('path'),
-    stream = require('stream'),
-    _ = require('busyman'),
+var _ = require('busyman'),
     Q = require('q'),
     chai = require('chai'),
     sinon = require('sinon'),
@@ -10,9 +7,12 @@ var fs = require('fs'),
 
 chai.use(sinonChai);
 
-var Coapdb = require('../lib/components/coapdb'),
+var NedbStorage = require('../lib/components/nedb-storage'),
     CoapNode = require('../lib/components/coap-node'),
-    defaultConfig = require('../lib/config');
+    defaultConfig = require('../lib/config'),
+    fixture = require('./fixture'),
+    _verifySignatureSync = fixture._verifySignatureSync,
+    _verifySignatureAsync = fixture._verifySignatureAsync;
 
 var devAttrs = {
         clientName: 'coap-client',
@@ -37,8 +37,7 @@ var sObj = {
         }
     };
 
-var dbPath = path.resolve('./test/database_test/coap.db'),
-    fakeShp,
+var fakeShp,
     node,
     reqObj,
     rspObj;
@@ -56,7 +55,7 @@ describe('coap-node', function () {
             },
             _newClientId: function () { return 1; },
             _config: Object.assign({}, defaultConfig),
-            _coapdb: new Coapdb(dbPath)
+            _storage: new NedbStorage('')
         };
         node = new CoapNode(fakeShp, devAttrs);
 
@@ -83,77 +82,30 @@ describe('coap-node', function () {
 
     describe('Signature Check', function () {
         it('new CoapNode()', function () {
-            expect(function () { return new CoapNode(fakeShp); }).to.throw();
-            expect(function () { return new CoapNode(fakeShp, 'x'); }).to.throw();
-            expect(function () { return new CoapNode(fakeShp, 1); }).to.throw();
-            expect(function () { return new CoapNode(fakeShp, []); }).to.throw();
-            expect(function () { return new CoapNode(null, {}); }).to.throw();
-            expect(function () { return new CoapNode('x', {}); }).to.throw();
-            expect(function () { return new CoapNode('1', {}); }).to.throw();
-            expect(function () { return new CoapNode([], {}); }).to.throw();
-            expect(function () { return new CoapNode({}, {}); }).to.throw();
-
-            expect(function () { return new CoapNode(fakeShp, {}); }).not.to.throw();
+            _verifySignatureSync(function (arg) { return new CoapNode(arg, {}); }, [fakeShp]);
+            _verifySignatureSync(function (arg) { return new CoapNode(fakeShp, arg); }, ['object']);
         });
 
         it('#.lifeCheck()', function () {
-            expect(function () { return node.lifeCheck(); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(undefined); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(null); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(NaN); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(10); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck('xx'); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck([]); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck({}); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(new Date()); }).to.throw(TypeError);
-            expect(function () { return node.lifeCheck(function () {}); }).to.throw(TypeError);
-
-            expect(function () { return node.lifeCheck(true); }).not.to.throw(TypeError);
+            _verifySignatureSync(function (arg) { node.lifeCheck(arg); }, ['boolean']);
         });
 
         it('#.sleepCheck()', function () {
-            expect(function () { return node.sleepCheck(); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(undefined); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(null); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(NaN); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(10); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck('xx'); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck([]); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck({}); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(new Date()); }).to.throw(TypeError);
-            expect(function () { return node.sleepCheck(function () {}); }).to.throw(TypeError);
-
-            expect(function () { return node.sleepCheck(true); }).not.to.throw(TypeError);
+            _verifySignatureSync(function (arg) { node.sleepCheck(arg); }, ['boolean']);
         });
 
         it('#._reqObj()', function () {
-            expect(function () { return node._reqObj('x'); }).to.throw();
-            expect(function () { return node._reqObj('x', 1); }).to.throw();
-            expect(function () { return node._reqObj('x', []); }).to.throw();
-            expect(function () { return node._reqObj('x', {}); }).to.throw();
-            expect(function () { return node._reqObj(null, 'x'); }).to.throw();
-            expect(function () { return node._reqObj(1, 'x'); }).to.throw();
-            expect(function () { return node._reqObj([], 'x'); }).to.throw();
-            expect(function () { return node._reqObj({}, 'x'); }).to.throw();
-
-            expect(function () { return node._reqObj('x', 'x'); }).not.to.throw();
+            _verifySignatureSync(function (arg) { node._reqObj(arg, arg); }, ['string']);
         });
 
         it('#._setStatus()', function () {
-            expect(function () { return node._setStatus(); }).to.throw();
-            expect(function () { return node._setStatus('x'); }).to.throw();
-            expect(function () { return node._setStatus(1); }).to.throw();
-            expect(function () { return node._setStatus([]); }).to.throw();
-            expect(function () { return node._setStatus({}); }).to.throw();
-
-            expect(function () { return node._setStatus('online'); }).not.to.throw();
-            expect(function () { return node._setStatus('offline'); }).not.to.throw();
+            _verifySignatureSync(function (arg) { node._setStatus(arg); }, [['online', 'offline', 'sleep']]);
         });
 
         // Asynchronous APIs
         describe('#.readReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.readReq([]); }).to.throw();
+                _verifySignatureSync(function (arg) { node.readReq(arg).done(); }, ['string']);
             });
 
             it('should return err if not registered', function (done) {
@@ -173,11 +125,7 @@ describe('coap-node', function () {
 
         describe('#.writeReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.writeReq([], 1); }).to.throw();
-            });
-
-            it('should throw err if path is object', function () {
-                expect(function () { return  node.writeReq('x', 1); }).to.throw();
+                _verifySignatureSync(function (arg) { node.writeReq(arg, 1).done(); }, ['string']);
             });
 
             it('should throw err if value is undefined', function () {
@@ -201,7 +149,7 @@ describe('coap-node', function () {
 
         describe('#.executeReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.executeReq([], []); }).to.throw();
+                _verifySignatureSync(function (arg) { node.executeReq(arg, []).done(); }, ['string']);
             });
 
             it('should return err if not registered', function (done) {
@@ -218,16 +166,16 @@ describe('coap-node', function () {
                 });
             });
 
-            it('should return err if args is not an array', function (done) {
-                node.executeReq('x/y/z', 10).fail(function (err) {
-                    done();
-                });
+            it('should return err if args is not an array', function () {
+                return _verifySignatureAsync(function (arg) {
+                    return node.executeReq('x/y/z', arg, undefined);
+                }, ['undefined', 'null', 'array']);
             });
         });
 
         describe('#.discoverReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.discoverReq([], []); }).to.throw();
+                _verifySignatureSync(function (arg) { node.discoverReq(arg).done(); }, ['string']);
             });
 
             it('should return err if not registered', function (done) {
@@ -247,11 +195,11 @@ describe('coap-node', function () {
 
         describe('#.writeAttrReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.writeAttrsReq([], {}); }).to.throw();
+                _verifySignatureSync(function (arg) { node.writeAttrsReq(arg, {}).done(); }, ['string']);
             });
 
             it('should throw err if attrs is not an object', function () {
-                expect(function () { return  node.writeAttrsReq('x/y', 10); }).to.throw();
+                _verifySignatureSync(function (arg) { node.writeAttrsReq('x/y', arg).done(); }, ['object']);
             });
 
             it('should return err if not registered', function (done) {
@@ -271,7 +219,7 @@ describe('coap-node', function () {
 
         describe('#.observeReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.observeReq([], {}); }).to.throw();
+                _verifySignatureSync(function (arg) { node.observeReq(arg).done(); }, ['string']);
             });
 
             it('should return err if not registered', function (done) {
@@ -291,7 +239,7 @@ describe('coap-node', function () {
 
         describe('#.cancelObserveReq()', function () {
             it('should throw err if path is not a string', function () {
-                expect(function () { return  node.cancelObserveReq([], {}); }).to.throw();
+                _verifySignatureSync(function (arg) { node.cancelObserveReq(arg).done(); }, ['string']);
             });
 
             it('should return err if not registered', function (done) {
@@ -318,51 +266,9 @@ describe('coap-node', function () {
             });
         });
 
-        describe('#._updateObjectInstance()', function () { 
-            it('should return err if oid is not a string or a number', function (done) {
-                node._updateObjectInstance([], 0, {}).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if iid is not a string or a number', function (done) {
-                node._updateObjectInstance('x', [], {}).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if data is not an object', function (done) {
-                node._updateObjectInstance('x', [], {}).fail(function (err) {
-                    done();
-                });
-            });
-        });
-
-        describe('#._updateResource()', function () { 
-            it('should return err if oid is not a string or a number', function (done) {
-                node._updateResource([], 0, 'z', 10).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if iid is not a string or a number', function (done) {
-                node._updateResource('x', [], 'z', 10).fail(function (err) {
-                    done();
-                });
-            });
-
-            it('should return err if rid is not a string or a number', function (done) {
-                node._updateResource('x', 0, [], 10).fail(function (err) {
-                    done();
-                });
-            });
-        });
-
         describe('#._updateAttrs()', function () { 
-            it('should return err if attrs is not an object', function (done) {
-                node._updateObjectInstance('x').fail(function (err) {
-                    done();
-                });
+            it('should return err if attrs is not an object', function () {
+                return _verifySignatureAsync(function (arg) { return node._updateAttrs(arg); }, ['object']);
             });
         });
     });
@@ -430,9 +336,10 @@ describe('coap-node', function () {
                 };
 
                 node.readReq('/x/0/x0').then(function (rsp) {
-                    if (rsp.status === '2.05' && rsp.data === 10)
-                        done();
-                });
+                    expect(rsp.status).to.equal('2.05');
+                    expect(rsp.data).to.equal(10);
+                    done();
+                }).done();
             });
 
             it('should read Object Instance and return status 2.05', function (done) {
@@ -900,113 +807,39 @@ describe('coap-node', function () {
             });
         });
 
-        describe('#.dbSave()', function () {
-            it('should save node record to db, and return node record', function (done) {
-                var dumper = {
-                    clientName: 'coap-client',
-                    clientId: 1,
-                    ip: '192.168.1.100',
-                    port: '5685',
-                    mac: 'AA:BB:CC:DD:EE:00',
-                    lifetime: 86400,
-                    version: '1.0.0',
-                    objList: { x: [0, 1] },
-                    observedList: [],
-                    heartbeatEnabled: true,
-                    so: {
-                        x: sObj
-                    }
-                };
-
-                node.dbSave().then(function (ndata) {
-                    delete ndata._id;
-                    delete ndata.joinTime;
-
-                    if (_.isEqual(ndata, dumper)) done();
-                });
-            });
-        });
-
-        describe('#.dbRead()', function () {
-            it('should read node record from db, and return node record', function (done) {
-                var dumper = {
-                    clientName: 'coap-client',
-                    clientId: 1,
-                    ip: '192.168.1.100',
-                    port: '5685',
-                    mac: 'AA:BB:CC:DD:EE:00',
-                    lifetime: 86400,
-                    version: '1.0.0',
-                    objList: { x: [0, 1] },
-                    observedList: [],
-                    heartbeatEnabled: true,
-                    so: {
-                        x: sObj
-                    }
-                };
-
-                node.dbRead().then(function (ndata) {
-                    delete ndata.joinTime;
-                    if (_.isEqual(ndata, dumper)) done();
-                });
-            });
-        });
-
         describe('#._updateAttrs()', function () {
+            before(function (done) {
+                var dumper = {
+                    clientName: 'coap-client',
+                    clientId: 1,
+                    ip: '192.168.1.100',
+                    port: '5685',
+                    mac: 'AA:BB:CC:DD:EE:00',
+                    lifetime: 86400,
+                    version: '1.0.0',
+                    objList: { x: [0, 1] },
+                    observedList: [],
+                    heartbeatEnabled: true,
+                    so: {
+                        x: sObj
+                    }
+                };
+
+                node.shepherd._storage.save(node).then(function (data) {
+                    expect(data).to.deep.equal(dumper);
+                    done();
+                }).done();
+            });
+
             it('should update node attrs, and return diff', function (done) {
-                var attrs = { lifetime: 60000, version: '1.0.1' };
+                var attrs = { lifetime: 60000, version: '1.0.1' }, oldClientName = node.clientName;
                 node._updateAttrs(attrs).then(function (diff) {
-                    if (_.isEqual(diff, attrs)) done();
-                });
-            });
-        });
-        
-        describe('#._updateObjectInstance()', function () {
-            it('should update Object Instance, and return diff', function (done) {
-                var data = {
-                        x0: 9,
-                        x1: 19
-                    };
-
-                node._updateObjectInstance('x', 0, data).then(function (diff) {
-                    if (_.isEqual(diff, data)) done();
-                });
-            });
-
-            it('should not update Object Instance, and return bad path err', function (done) {
-                var data = {
-                        x0: 55,
-                        x1: 555
-                    };
-
-                node._updateObjectInstance('a', 0, data).fail(function () {
+                    expect(diff).to.deep.equal(attrs);
+                    expect(node.lifetime).to.equal(attrs.lifetime);
+                    expect(node.version).to.equal(attrs.version);
+                    expect(node.clientName).to.equal(oldClientName);
                     done();
-                });
-            });
-
-            it('should not update Object Instance, and return bad data err', function (done) {
-                var data = {
-                        a: 9,
-                        b: 19
-                    };
-
-                node._updateObjectInstance('x', 0, data).fail(function () {
-                    done();
-                });
-            });
-        });
-
-        describe('#._updateResource()', function () {
-            it('should update Resource, and return diff', function (done) {
-                node._updateResource('x', 0, 'x0', 99).then(function (diff) {
-                    if (diff === 99) done();
-                });
-            });
-
-            it('should not update Resource, and return bad data err', function (done) {
-                node._updateResource('x', 0, 'xx', 99).fail(function () {
-                    done();
-                });
+                }).done();
             });
         });
 
@@ -1017,36 +850,60 @@ describe('coap-node', function () {
                             x0: 33,
                             x1: 333
                         }
+                    },
+                    expected = {
+                        x: {
+                            0: { x0: 10, x1: 20 },
+                            1: { x0: 33, x1: 333 }
+                        }
                     };
                 node._updateSoAndDb('/x', data).then(function (diff) {
-                    if (_.isEqual(diff[0], data[1])) done();
-                });
+                    expect(diff).to.deep.equal({ x: data });
+                    var loaded = new CoapNode(node.shepherd, { clientName: node.clientName });
+                    node.shepherd._storage.load(loaded).then(function () {
+                        expect(loaded.dump().so).to.deep.equal(expected);
+                        done();
+                    }).done();
+                }).done();
             });
 
             it('should update Object Instance and db, and return diff', function (done) {
                 var data = {
                         x0: 109,
                         x1: 209
+                    },
+                    expected = {
+                        x: {
+                            0: { x0: 10, x1: 20 },
+                            1: { x0: 109, x1: 209 }
+                        }
                     };
                 node._updateSoAndDb('/x/1', data).then(function (diff) {
-                    if (_.isEqual(diff, data)) done();
-                });
+                    expect(diff).to.deep.equal({ x: { 1: data } });
+                    var loaded = new CoapNode(node.shepherd, { clientName: node.clientName });
+                    node.shepherd._storage.load(loaded).then(function () {
+                        expect(loaded.dump().so).to.deep.equal(expected);
+                        done();
+                    }).done();
+                }).done();
             });
 
-            it('should update Resourse and db, and return diff', function (done) {
-                node._updateSoAndDb('/x/1/x0', 199).then(function (diff) {
-                    if (diff === 199) done();
-                });
-            });
-        });
-
-        describe('#.dbRemove()', function () {
-            it('should read node record in db', function (done) {
-                node.dbRemove().then(function () {
-                    return node.dbRead();
-                }).fail(function (err) {
-                    done();
-                });
+            it('should update Resource and db, and return diff', function (done) {
+                var data = 199,
+                    expected = {
+                        x: {
+                            0: { x0: 10, x1: 20 },
+                            1: { x0: 199, x1: 209 }
+                        }
+                    };
+                node._updateSoAndDb('/x/1/x0', data).then(function (diff) {
+                    expect(diff).to.deep.equal({ x: { 1: { x0: data } } });
+                    var loaded = new CoapNode(node.shepherd, { clientName: node.clientName });
+                    node.shepherd._storage.load(loaded).then(function () {
+                        expect(loaded.dump().so).to.deep.equal(expected);
+                        done();
+                    }).done();
+                }).done();
             });
         });
     });
