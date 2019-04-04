@@ -9,6 +9,7 @@ chai.use(sinonChai);
 
 var NedbStorage = require('../lib/components/nedb-storage'),
     CoapNode = require('../lib/components/coap-node'),
+    cutils = require('../lib/components/cutils'),
     defaultConfig = require('../lib/config'),
     fixture = require('./fixture'),
     _verifySignatureSync = fixture._verifySignatureSync,
@@ -44,11 +45,11 @@ var fakeShp,
 
 describe('coap-node', function () {
     before(function () {
-        fakeShp = { 
+        fakeShp = {
             emit: function () {},
             request: function (req, callback) {
                 var deferred = Q.defer();
-                if (_.isEqual(req, reqObj)) 
+                if (_.isEqual(req, reqObj))
                     deferred.resolve(rspObj);
 
                 return deferred.promise.nodeify(callback);
@@ -266,7 +267,7 @@ describe('coap-node', function () {
             });
         });
 
-        describe('#._updateAttrs()', function () { 
+        describe('#._updateAttrs()', function () {
             it('should return err if attrs is not an object', function () {
                 return _verifySignatureAsync(function (arg) { return node._updateAttrs(arg); }, ['object']);
             });
@@ -310,11 +311,11 @@ describe('coap-node', function () {
 
         describe('#._reqObj()', function () {
             it('should return reqObj', function () {
-                var obj = { 
-                    hostname: '192.168.1.100', 
-                    port: '5685', 
-                    pathname: 'x', 
-                    method: 'GET' 
+                var obj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: 'x',
+                    method: 'GET'
                 };
 
                 expect(node._reqObj('GET', 'x')).to.be.eql(obj);
@@ -465,8 +466,8 @@ describe('coap-node', function () {
             it('should discover Resource and return status 2.05', function (done) {
                 var obj = {
                     path: '/x/0/x0',
-                    attrs: { 
-                        pmin: 10, 
+                    attrs: {
+                        pmin: 10,
                         pmax: 60
                     }
                 };
@@ -497,8 +498,8 @@ describe('coap-node', function () {
             it('should discover Object Instance and return status 2.05', function (done) {
                 var obj = {
                     path: '/x/0',
-                    attrs: { 
-                        pmin: 10, 
+                    attrs: {
+                        pmin: 10,
                         pmax: 60
                     },
                     resrcList: ['/x/0/x0', '/x/0/x1']
@@ -530,8 +531,8 @@ describe('coap-node', function () {
             it('should discover Object and return status 2.05', function (done) {
                 var obj = {
                     path: '/x',
-                    attrs: { 
-                        pmin: 10, 
+                    attrs: {
+                        pmin: 10,
                         pmax: 60
                     },
                     resrcList: [ '/x/0/x0', '/x/0/x1', '/x/1/x0', '/x/1/x1' ]
@@ -711,6 +712,44 @@ describe('coap-node', function () {
                 });
             });
 
+            it('should call notifyHandler with latest Content-Format', function (done) {
+                var value = { hello: 'world' },
+                    _updateSoAndDbStub = sinon.stub(node, '_updateSoAndDb', function (path, data) {
+                        _updateSoAndDbStub.restore();
+                        expect(data).to.eql(value);
+                        return { done: function () {} };
+                    }),
+                    decodeJsonStub = sinon.stub(cutils, 'decodeJson', function (path, value) {
+                        decodeJsonStub.restore();
+                        return JSON.parse(value);
+                    });
+                reqObj = {
+                    hostname: '192.168.1.100',
+                    port: '5685',
+                    pathname: '/x/0/x0',
+                    method: 'GET',
+                    options: { Accept: 'application/json' },
+                    observe: true
+                };
+                rspObj.headers = { 'Content-Format': 'text/plain' };
+                rspObj.code = '2.05';
+                rspObj.payload = 10;
+                rspObj.close = function () {};
+                rspObj.once = function (event, handler) { handler(); };
+                rspObj.on = function (event, handler) {
+                    rspObj.headers['Content-Format'] = 'application/json';
+                    handler(JSON.stringify(value));
+                };
+                node.shepherd._enabled = true;
+
+                node.observeReq('/x/0/x0').then(function (rsp) {
+                    delete node.shepherd._enabled;
+                    expect(rsp.status).to.eql('2.05');
+                    expect(rsp.data).to.eql(10);
+                    done();
+                });
+            });
+
         });
 
         describe('#.cancelObserveReq()', function () {
@@ -790,7 +829,7 @@ describe('coap-node', function () {
                 nDump = node.dump();
 
                 delete nDump.joinTime;
-                
+
                 expect(nDump).to.be.eql(dumper);
             });
         });
