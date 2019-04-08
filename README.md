@@ -66,6 +66,17 @@ cserver.start(function (err) {  // start the server
 // Now cserver is going to automatically tackle most of the network managing things.
 ```
 
+Or you can pass a config object as an argument to the CoapShepherd constructor and instance the CoapShepherd by yourself:
+
+```js
+var CoapShepherd = require('coap-shepherd').constructor;
+var cshepherd = new CoapShepherd({
+    connectionType: 'udp6',
+    port: 5500,
+    defaultDbPath: __dirname + '/../lib/database/myShepherd.db'
+});
+```
+
 <br />
 
 ## License
