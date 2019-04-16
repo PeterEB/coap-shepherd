@@ -84,7 +84,7 @@ function _verifySignatureAsync(func, acceptedTypes) {
 function _fireSetTimeoutCallbackEarlier(counter, delay) {
     counter = counter || 1;
     delay = delay || 50;
-    var timerCb;
+    var timerCb, callTimerCb;
 
     global.setTimeout = function (cb, delay) {
         if (!--counter) {
@@ -96,9 +96,13 @@ function _fireSetTimeoutCallbackEarlier(counter, delay) {
             return _globalSetTimeout(cb, delay);
     };
 
-    _globalSetTimeout(function () {
-        timerCb();
-    }, delay);
+    callTimerCb = function () {
+        if (timerCb)
+            timerCb();
+        else
+            _globalSetTimeout(callTimerCb, delay);
+    };
+    _globalSetTimeout(callTimerCb, delay);
 }
 
 module.exports = {
