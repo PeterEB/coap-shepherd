@@ -305,6 +305,37 @@ describe('coap-shepherd', function () {
                 shepherd.clientIdCount = 1;
             });
 
+            it('should not crash if "ep" not passed in', function () {
+                var rsp = {},
+                    req = {
+                        code: '0.01',
+                        method: 'POST',
+                        url: '/rd?lt=86400&lwm2m=1.0.0&mac=AA:AA:AA',
+                        rsinfo: {
+                            address: '127.0.0.1',
+                            port: '5686'
+                        },
+                        payload: '</x/0>,</x/1>,</y/0>,</y/1>',
+                        headers: {}
+                    },
+                    oldSetImmediate = global.setImmediate,
+                    reqHandler;
+                rsp.setOption = sinon.spy();
+                rsp.end = sinon.spy();
+                global.setImmediate = sinon.spy();
+                emitClintReqMessage(shepherd, req, rsp);
+                expect(global.setImmediate).to.have.been.called;
+                reqHandler = global.setImmediate.args[0][0];
+                global.setImmediate = oldSetImmediate;
+
+                expect(reqHandler).not.to.throw();
+
+                expect(rsp.setOption).not.to.have.been.called;
+                expect(rsp.end).to.have.been.calledWith('');
+                expect(rsp.code).to.eql('4.00');
+                expect(shepherd.find('')).to.be.falsy;
+            });
+
             it('should register new cnode', function (done) {
                 var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
                         return Q.resolve({
@@ -384,6 +415,127 @@ describe('coap-shepherd', function () {
                         }
                     };
 
+                rsp.setOption = sinon.spy();
+                rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier(2);
+
+                shepherd.on('ind', regCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.01',
+                    method: 'POST',
+                    url: '/rd?ep=cnode02&lt=86400&lwm2m=1.0.0&mac=BB:BB:BB',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5687'
+                    },
+                    payload: '</a/0>,</a/1>,</b/0>,</b/1>',
+                    headers: {}
+                }, rsp);
+            });
+        });
+
+        describe('#config.clientNameParser', function () {
+            before(function () {
+                shepherd._config.clientNameParser = function (clientName) {
+                    return clientName.split(':')[1];
+                }
+            });
+
+            after(function (done) {
+                shepherd._config.clientNameParser = function (clientName) {
+                    return clientName;
+                };
+                shepherd.remove('cnode0X', done);
+            });
+
+            it('should keep the last part of clientName', function (done) {
+                var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: { a: {'0': { 'a0': 10, 'a1': 20 }, '1':{ 'a0': 11, 'a1': 21 }},
+                                b: {'0': { 'b0': 20, 'b1': 40 }, '1':{ 'b0': 22, 'b1': 44 }}}
+                        });
+                    }),
+                    observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: 'hb'
+                        });
+                    }),
+                    rsp = {},
+                    cnode,
+                    regCallback = function (msg) {
+                        if (msg.type === 'devIncoming') {
+                            _readAllResourceStub.restore();
+                            observeReqStub.restore();
+                            shepherd.removeListener('ind', regCallback);
+                            cnode = msg.cnode;
+                            expect(cnode.clientName).to.eql('cnode0X');
+                            expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
+                            expect(rsp.end).to.have.been.calledWith('');
+                            expect(shepherd.find('cnode0X')).to.be.truthy;
+                            done();
+                        }
+                    };
+
+                rsp.setOption = sinon.spy();
+                rsp.end = sinon.spy();
+                _fireSetTimeoutCallbackEarlier(2);
+
+                shepherd.on('ind', regCallback);
+
+                emitClintReqMessage(shepherd, {
+                    code: '0.01',
+                    method: 'POST',
+                    url: '/rd?ep=urn:cnode0X&lt=86400&lwm2m=1.0.0&mac=FF:FF:FF',
+                    rsinfo: {
+                        address: '127.0.0.1',
+                        port: '5687'
+                    },
+                    payload: '</a/0>,</a/1>,</b/0>,</b/1>',
+                    headers: {}
+                }, rsp);
+            });
+        });
+
+        describe('#config.alwaysFireDevIncoming', function () {
+            before(function () {
+                shepherd._config.alwaysFireDevIncoming = true;
+            });
+
+            after(function () {
+                shepherd._config.alwaysFireDevIncoming = false;
+            });
+
+            it('should fire devIncoming', function (done) {
+                var _readAllResourceStub = sinon.stub(CoapNode.prototype, '_readAllResource', function (path, callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: { a: {'0': { 'a0': 10, 'a1': 20 }, '1':{ 'a0': 11, 'a1': 21 }},
+                                b: {'0': { 'b0': 20, 'b1': 40 }, '1':{ 'b0': 22, 'b1': 44 }}}
+                        });
+                    }),
+                    observeReqStub = sinon.stub(CoapNode.prototype, 'observeReq', function (callback) {
+                        return Q.resolve({
+                            status: '2.05',
+                            data: 'hb'
+                        });
+                    }),
+                    rsp = {},
+                    cnode,
+                    regCallback = function (msg) {
+                        _readAllResourceStub.restore();
+                        observeReqStub.restore();
+                        shepherd.removeListener('ind', regCallback);
+                        expect(msg.type).to.eql('devIncoming');
+                        cnode = msg.cnode;
+                        expect(rsp.setOption).to.have.been.calledWith('Location-Path', [new Buffer('rd'),new Buffer(cnode.clientId.toString())]);
+                        expect(rsp.end).to.have.been.calledWith('');
+                        expect(shepherd.find('cnode02')).to.eql(cnode);
+                        done();
+                    };
+                expect(shepherd.find('cnode02')).to.be.truthy;
                 rsp.setOption = sinon.spy();
                 rsp.end = sinon.spy();
                 _fireSetTimeoutCallbackEarlier(2);
@@ -691,6 +843,38 @@ describe('coap-shepherd', function () {
             });
         });
 
+        describe('#.lookup', function () {
+            it('should not crash if "ep" not passed in', function () {
+                var rsp = {},
+                    req = {
+                        code: '0.01',
+                        method: 'GET',
+                        url: '/lookup?lt=86400&lwm2m=1.0.0&mac=AA:AA:AA',
+                        rsinfo: {
+                            address: '127.0.0.1',
+                            port: '5686'
+                        },
+                        payload: '</x/0>,</x/1>,</y/0>,</y/1>',
+                        headers: {}
+                    },
+                    oldSetImmediate = global.setImmediate,
+                    reqHandler;
+                rsp.setOption = sinon.spy();
+                rsp.end = sinon.spy();
+                global.setImmediate = sinon.spy();
+                emitClintReqMessage(shepherd, req, rsp);
+                expect(global.setImmediate).to.have.been.called;
+                reqHandler = global.setImmediate.args[0][0];
+                global.setImmediate = oldSetImmediate;
+
+                expect(reqHandler).not.to.throw();
+
+                expect(rsp.setOption).not.to.have.been.called;
+                expect(rsp.end).to.have.been.calledWith('');
+                expect(rsp.code).to.eql('4.00');
+            });
+        });
+
         describe('#.find()', function () {
             it('should find cnode01 by clientName and return cnode01', function () {
                 var cnode01 = shepherd.find('cnode01');
@@ -752,7 +936,7 @@ describe('coap-shepherd', function () {
                 var server = coap.createServer();
 
                 server.on('request', function (req, rsp) {
-                    if (req.payload.method === 'PUT') 
+                    if (req.payload.method === 'PUT')
                         done();
                 });
 
@@ -770,7 +954,7 @@ describe('coap-shepherd', function () {
                 var server = coap.createServer();
 
                 server.on('request', function (req, rsp) {
-                    if (req.payload.toString() === 'Hum') 
+                    if (req.payload.toString() === 'Hum')
                         done();
                 });
 
