@@ -1,7 +1,8 @@
 var fs = require('fs'),
     path = require('path');
 
-var shepherd = require('../index.js');
+var CoapShepherd = require('../index.js');
+var shepherd = new CoapShepherd();
 
 try {
     fs.unlinkSync(path.resolve('../lib/database/coap.db'));
@@ -59,7 +60,6 @@ function handler (msg) {
 
     if (msg.type === 'devIncoming') {
         cnode = msg.cnode;
-        cnode.observeReq('/presence/0/dInState', reqHandler);
 
 // read test
         // setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);

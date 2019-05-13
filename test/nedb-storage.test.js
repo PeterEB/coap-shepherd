@@ -7,7 +7,7 @@ var fs = require('fs'),
     sinonChai = require('sinon-chai'),
     Datastore = require('nedb'),
 
-    defaultConfig = require('../lib/config'),
+    defaultConfig = require('../lib/defaultConfig'),
     CoapNode = require('../lib/components/coap-node'),
     StorageInterface = require('../lib/components/storage-interface'),
     NedbStorage = require('../lib/components/nedb-storage.js'),

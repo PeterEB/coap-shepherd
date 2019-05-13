@@ -10,7 +10,7 @@ chai.use(sinonChai);
 var NedbStorage = require('../lib/components/nedb-storage'),
     CoapNode = require('../lib/components/coap-node'),
     cutils = require('../lib/components/cutils'),
-    defaultConfig = require('../lib/config'),
+    defaultConfig = require('../lib/defaultConfig'),
     fixture = require('./fixture'),
     _verifySignatureSync = fixture._verifySignatureSync,
     _verifySignatureAsync = fixture._verifySignatureAsync;

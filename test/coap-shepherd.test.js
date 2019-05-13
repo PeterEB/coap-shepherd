@@ -13,8 +13,7 @@ chai.use(sinonChai);
 var CoapNode = require('../lib/components/coap-node'),
     StorageInterface = require('../lib/components/storage-interface'),
     NedbStorage = require('../lib/components/nedb-storage'),
-    shepherd = require('../lib/coap-shepherd'),
-    CoapShepherd = shepherd.constructor,
+    CoapShepherd = require('../lib/coap-shepherd'),
     init = require('../lib/init'),
     fixture = require('./fixture'),
     _verifySignatureSync = fixture._verifySignatureSync,
@@ -33,11 +32,15 @@ var interface6 = {
     };
 
 describe('coap-shepherd', function () {
+    var shepherd;
+
     before(function (done) {
         fs.unlink(path.resolve('./lib/database/coap.db'), function (err) {
             expect(err).to.equal(null);
             done();
         });
+
+        shepherd = new CoapShepherd();
     });
 
     describe('Constructor Check', function () {

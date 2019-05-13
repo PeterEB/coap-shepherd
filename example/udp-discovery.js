@@ -4,7 +4,7 @@ var discover = new Discovery();
 
 var cnode;
 
-var name = 'freebird-demo-ip-broadcast',
+var name = 'demo-ip-broadcast',
     interval = 500,
     available = true,
     serv = {
