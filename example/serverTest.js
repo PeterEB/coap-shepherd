@@ -59,6 +59,7 @@ function handler (msg) {
 
     if (msg.type === 'devIncoming') {
         cnode = msg.cnode;
+        cnode.observeReq('/presence/0/dInState', reqHandler);
 
 // read test
         // setTimeout(function () { cnode.readReq('/3303/0/5700', reqHandler); }, 5000);

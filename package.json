@@ -5,8 +5,9 @@
   "main": "index.js",
   "dependencies": {
     "busyman": "^0.3.0",
-    "coap": "https://github.com/PeterEB/node-coap.git",
+    "coap": "^0.23.1",
     "debug": "^2.2.0",
+    "firmata": "^0.10.1",
     "lwm2m-codec": "0.1.1",
     "lwm2m-id": "^1.6.1",
     "nedb": "^1.8.0",
