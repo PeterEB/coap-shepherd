@@ -48,7 +48,8 @@ Please visit the [Wiki](https://github.com/PeterEB/coap-shepherd/wiki).
 This example shows how to start a server and allow devices to join the network within 180 seconds after the server is ready:
 
 ```js
-var cserver = require('coap-shepherd');
+var CoapShepherd = require('coap-shepherd');
+var cserver = new CoapShepherd();
 
 cserver.on('ready', function () {
     console.log('Server is ready.');
@@ -66,10 +67,10 @@ cserver.start(function (err) {  // start the server
 // Now cserver is going to automatically tackle most of the network managing things.
 ```
 
-Or you can pass a config object as an argument to the CoapShepherd constructor and instance the CoapShepherd by yourself:
+Or you can pass a config object as an argument to the CoapShepherd constructor:
 
 ```js
-var CoapShepherd = require('coap-shepherd').constructor;
+var CoapShepherd = require('coap-shepherd');
 var cshepherd = new CoapShepherd({
     connectionType: 'udp6',
     port: 5500,
