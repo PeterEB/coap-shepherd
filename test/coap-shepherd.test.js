@@ -35,12 +35,12 @@ describe('coap-shepherd', function () {
     var shepherd;
 
     before(function (done) {
+        shepherd = new CoapShepherd();
+
         fs.unlink(path.resolve('./lib/database/coap.db'), function (err) {
             expect(err).to.equal(null);
             done();
         });
-
-        shepherd = new CoapShepherd();
     });
 
     describe('Constructor Check', function () {
